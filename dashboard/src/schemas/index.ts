@@ -10,12 +10,14 @@ export const NodeTypeSchema = z.enum([
   'StakeholderReq',
   'SystemReq',
   'SoftwareReq',
+  'HardwareReq',
   'TestCase',
   'InputSpec',
   'Komponente',
   'Pattern',
   'Feedback',
   'LearningEvent',
+  'Regel',
 ])
 export type NodeType = z.infer<typeof NodeTypeSchema>
 
