@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx @claude-flow/cli@latest swarm init:*)",
+      "Bash(npx @claude-flow/cli@latest hooks pre-task:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "claude-flow",
+    "ruv-swarm",
+    "context7"
+  ]
+}

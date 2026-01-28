@@ -13,6 +13,15 @@ import { analyzeImpact } from './tools/impact-analysis.js';
 import { validateRules } from './tools/validate.js';
 import { addRule, toggleRule } from './tools/rules.js';
 import { calculateComplianceScore } from './tools/compliance-score.js';
+// CR-009: Stufe 6 - ML & Prediction
+import { analyzeCentrality } from './tools/centrality.js';
+import { predictMissingLinks } from './tools/predict-links.js';
+import { findSimilarRequirements } from './tools/similarity.js';
+// CR-009: Stufe 7 - Learning System
+import { recordFeedback } from './tools/record-feedback.js';
+import { detectPatterns } from './tools/detect-patterns.js';
+import { getLearningTimeline } from './tools/learning-timeline.js';
+import { getMemoryStats } from './tools/memory-stats.js';
 
 // Neo4j connection configuration
 const NEO4J_URI = process.env.NEO4J_URI || 'bolt://localhost:7687';
@@ -211,6 +220,116 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           type: 'object',
           properties: {}
         }
+      },
+      // CR-009: Stufe 6 - ML & Prediction
+      {
+        name: 'centrality_analysis',
+        description: 'Analysiere Centrality-Metriken: PageRank für Wichtigkeit, Betweenness für Bottlenecks. Identifiziert kritische Requirements.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            limit: {
+              type: 'number',
+              description: 'Anzahl Top-Ergebnisse (default: 5)'
+            },
+            nodeLabel: {
+              type: 'string',
+              description: 'Optional: Filter auf bestimmten Knotentyp (z.B. SystemReq)'
+            }
+          }
+        }
+      },
+      {
+        name: 'predict_missing_links',
+        description: 'Sage fehlende Traceability-Links voraus. Findet Requirements ohne Tests, fehlende Ableitungen, unverlinkte Abhängigkeiten.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            minConfidence: {
+              type: 'number',
+              description: 'Minimale Konfidenz für Vorhersagen (default: 0.5)'
+            },
+            limit: {
+              type: 'number',
+              description: 'Maximale Anzahl Vorhersagen (default: 10)'
+            }
+          }
+        }
+      },
+      {
+        name: 'find_similar_requirements',
+        description: 'Finde strukturell ähnliche Requirements basierend auf gemeinsamen Nachbarn (Jaccard Similarity).',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            requirementId: {
+              type: 'string',
+              description: 'ID des Referenz-Requirements'
+            },
+            limit: {
+              type: 'number',
+              description: 'Anzahl ähnlicher Requirements (default: 5)'
+            },
+            minSimilarity: {
+              type: 'number',
+              description: 'Minimale Ähnlichkeit 0-1 (default: 0.3)'
+            }
+          },
+          required: ['requirementId']
+        }
+      },
+      // CR-009: Stufe 7 - Learning System
+      {
+        name: 'record_feedback',
+        description: 'Speichere Feedback zu einem Requirement. Das System lernt aus Review-Kommentaren und erkennt Patterns.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            targetId: {
+              type: 'string',
+              description: 'ID des Requirements (z.B. SYS-003)'
+            },
+            issue: {
+              type: 'string',
+              description: 'Beschreibung des Feedbacks/Problems'
+            },
+            type: {
+              type: 'string',
+              enum: ['review', 'observation', 'question'],
+              description: 'Art des Feedbacks (default: review)'
+            }
+          },
+          required: ['targetId', 'issue']
+        }
+      },
+      {
+        name: 'detect_patterns',
+        description: 'Erkenne Anti-Patterns in Requirements. Sucht nach vagen Zeitangaben, unspezifizierten Bedingungen, fehlenden Einheiten.',
+        inputSchema: {
+          type: 'object',
+          properties: {}
+        }
+      },
+      {
+        name: 'learning_timeline',
+        description: 'Zeige was das System wann gelernt hat. Chronologische Übersicht aller Learning Events.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            limit: {
+              type: 'number',
+              description: 'Anzahl Events (default: 50)'
+            }
+          }
+        }
+      },
+      {
+        name: 'memory_stats',
+        description: 'Zeige Statistiken über das System-Gedächtnis. Feedback-Einträge, erkannte Patterns, Knowledge Score.',
+        inputSchema: {
+          type: 'object',
+          properties: {}
+        }
       }
     ]
   };
@@ -311,6 +430,116 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case 'compliance_score': {
         const result = await calculateComplianceScore(driver);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2)
+            }
+          ]
+        };
+      }
+
+      // CR-009: Stufe 6 - ML & Prediction
+      case 'centrality_analysis': {
+        const result = await analyzeCentrality(driver, {
+          limit: args?.limit as number,
+          nodeLabel: args?.nodeLabel as string
+        });
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2)
+            }
+          ]
+        };
+      }
+
+      case 'predict_missing_links': {
+        const result = await predictMissingLinks(driver, {
+          minConfidence: args?.minConfidence as number,
+          limit: args?.limit as number
+        });
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2)
+            }
+          ]
+        };
+      }
+
+      case 'find_similar_requirements': {
+        const requirementId = args?.requirementId as string;
+        if (!requirementId) {
+          throw new Error('requirementId parameter is required');
+        }
+        const result = await findSimilarRequirements(driver, requirementId, {
+          limit: args?.limit as number,
+          minSimilarity: args?.minSimilarity as number
+        });
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2)
+            }
+          ]
+        };
+      }
+
+      // CR-009: Stufe 7 - Learning System
+      case 'record_feedback': {
+        const targetId = args?.targetId as string;
+        const issue = args?.issue as string;
+        if (!targetId || !issue) {
+          throw new Error('targetId and issue parameters are required');
+        }
+        const result = await recordFeedback(driver, {
+          targetId,
+          issue,
+          type: args?.type as 'review' | 'observation' | 'question'
+        });
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2)
+            }
+          ]
+        };
+      }
+
+      case 'detect_patterns': {
+        const result = await detectPatterns(driver);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2)
+            }
+          ]
+        };
+      }
+
+      case 'learning_timeline': {
+        const result = await getLearningTimeline(driver, {
+          limit: args?.limit as number
+        });
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2)
+            }
+          ]
+        };
+      }
+
+      case 'memory_stats': {
+        const result = await getMemoryStats(driver);
         return {
           content: [
             {
