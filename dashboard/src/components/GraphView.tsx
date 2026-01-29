@@ -85,19 +85,19 @@ export function GraphView() {
     })
   }, [graphData, filters])
 
-  // Convert nodes to vis-network format
+  // Convert nodes to vis-network format (use hex colors - CSS vars don't work on canvas)
   const convertNodes = useCallback(
     (nodes: GraphNode[]): VisNode[] => {
       return nodes.map((node) => ({
         id: node.id,
-        label: node.label,
+        label: node.id, // Use ID as label for visibility
         color: highlightedNodes.has(node.id)
-          ? 'var(--color-warning)'
+          ? '#f59e0b' // warning color
           : NODE_COLORS[node.type],
         shape: NODE_SHAPES[node.type],
-        size: 20 + (node.pageRank || 0) * 50,
-        font: { color: 'var(--color-text-primary)' },
-        borderWidth: selectedNodeId === node.id ? 3 : 1,
+        size: 25 + (node.centrality || 0) * 30, // Use centrality, min size 25
+        font: { color: '#f8fafc' }, // hex color for canvas
+        borderWidth: selectedNodeId === node.id ? 3 : 2,
         borderWidthSelected: 4,
       }))
     },
@@ -122,15 +122,18 @@ export function GraphView() {
       width: '100%',
       nodes: {
         font: {
-          size: 12,
+          size: 14,
           color: '#f8fafc',
           face: 'Inter, system-ui, sans-serif',
+          strokeWidth: 3,
+          strokeColor: '#0f172a',
         },
-        borderWidth: 1,
+        borderWidth: 2,
+        borderWidthSelected: 4,
         shadow: {
           enabled: true,
-          color: 'rgba(0,0,0,0.3)',
-          size: 10,
+          color: 'rgba(0,0,0,0.5)',
+          size: 8,
           x: 2,
           y: 2,
         },
@@ -142,8 +145,12 @@ export function GraphView() {
           roundness: 0.5,
         },
         color: {
+          color: '#64748b',
+          highlight: '#94a3b8',
+          hover: '#94a3b8',
           inherit: false,
         },
+        width: 2,
       },
       physics: {
         enabled: true,
@@ -220,13 +227,13 @@ export function GraphView() {
         id: edge.id,
         from: edge.from,
         to: edge.to,
-        label: edge.label,
-        width: 1 + (edge.weight || 0.5) * 3,
+        label: edge.type, // Show relationship type as label
+        width: 2,
         color: {
-          color: 'var(--color-edge-default)',
-          opacity: 0.6 + (edge.weight || 0.5) * 0.4,
+          color: '#94a3b8', // Visible gray on dark background
+          opacity: 0.8,
         },
-        arrows: { to: { enabled: true, scaleFactor: 0.5 } },
+        arrows: { to: { enabled: true, scaleFactor: 0.6 } },
       }))
 
     edgesDataSetRef.current.clear()
@@ -240,9 +247,9 @@ export function GraphView() {
     const updates = filteredNodes.map((node) => ({
       id: node.id,
       color: highlightedNodes.has(node.id)
-        ? 'var(--color-warning)'
+        ? '#f59e0b' // warning color hex
         : NODE_COLORS[node.type],
-      borderWidth: selectedNodeId === node.id ? 3 : 1,
+      borderWidth: selectedNodeId === node.id ? 3 : 2,
     }))
 
     nodesDataSetRef.current.update(updates)
