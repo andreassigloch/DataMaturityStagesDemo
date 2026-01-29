@@ -27,7 +27,7 @@ const EVENT_ICONS: Record<MemoryEvent['eventType'], string> = {
 
 function formatTimestamp(isoString: string): string {
   const date = new Date(isoString)
-  return date.toLocaleTimeString('en-US', {
+  return date.toLocaleTimeString('de-DE', {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
@@ -39,10 +39,10 @@ function formatRelativeTime(isoString: string): string {
   const eventTime = new Date(isoString).getTime()
   const diff = now - eventTime
 
-  if (diff < 60000) return 'just now'
-  if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`
-  if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`
-  return `${Math.floor(diff / 86400000)}d ago`
+  if (diff < 60000) return 'gerade eben'
+  if (diff < 3600000) return `vor ${Math.floor(diff / 60000)} Min`
+  if (diff < 86400000) return `vor ${Math.floor(diff / 3600000)} Std`
+  return `vor ${Math.floor(diff / 86400000)} Tagen`
 }
 
 interface TimelineEventProps {
@@ -127,10 +127,6 @@ function TimelineEvent({ event, isNew }: TimelineEventProps) {
 
 export function MemoryTimeline() {
   const memoryEvents = useDashboardStore((s) => s.memoryEvents)
-  const isPlaying = useDashboardStore((s) => s.isTimelinePlaying)
-  const timelineSpeed = useDashboardStore((s) => s.timelineSpeed)
-  const setPlaying = useDashboardStore((s) => s.setTimelinePlaying)
-  const setSpeed = useDashboardStore((s) => s.setTimelineSpeed)
 
   const containerRef = useRef<HTMLDivElement>(null)
   const lastEventIdRef = useRef<string | null>(null)
@@ -151,59 +147,16 @@ export function MemoryTimeline() {
 
   return (
     <div className="flex h-full flex-col" data-testid="memory-timeline">
-      {/* Controls */}
+      {/* Header */}
       <div
-        className="flex items-center justify-between border-b border-[var(--color-border)] px-4 py-3"
-        data-testid="timeline-controls"
+        className="flex items-center justify-end border-b border-[var(--color-border)] px-4 py-3"
+        data-testid="timeline-header"
       >
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setPlaying(!isPlaying)}
-            className="flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-primary)] text-white transition-colors hover:bg-[var(--color-primary-hover)]"
-            data-testid="play-pause-button"
-            aria-label={isPlaying ? 'Pause' : 'Play'}
-          >
-            {isPlaying ? (
-              <svg
-                className="h-4 w-4"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <rect x="6" y="4" width="4" height="16" />
-                <rect x="14" y="4" width="4" height="16" />
-              </svg>
-            ) : (
-              <svg
-                className="h-4 w-4"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <polygon points="5,3 19,12 5,21" />
-              </svg>
-            )}
-          </button>
-
-          <span className="text-sm text-[var(--color-text-muted)]">
-            Speed:
-          </span>
-          <select
-            value={timelineSpeed}
-            onChange={(e) => setSpeed(Number(e.target.value))}
-            className="rounded border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-1 text-sm text-[var(--color-text-primary)]"
-            data-testid="speed-selector"
-          >
-            <option value={0.5}>0.5x</option>
-            <option value={1}>1x</option>
-            <option value={2}>2x</option>
-            <option value={4}>4x</option>
-          </select>
-        </div>
-
         <div
           className="text-sm text-[var(--color-text-muted)]"
           data-testid="event-count"
         >
-          {memoryEvents.length} events
+          {memoryEvents.length} Einträge
         </div>
       </div>
 
@@ -241,7 +194,7 @@ export function MemoryTimeline() {
             data-testid="timeline-empty"
           >
             <p className="text-sm text-[var(--color-text-muted)]">
-              No memory events yet. Learning will appear here.
+              Noch keine Lernschritte. Erkenntnisse werden hier angezeigt.
             </p>
           </div>
         ) : (

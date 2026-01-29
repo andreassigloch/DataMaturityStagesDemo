@@ -195,9 +195,14 @@ function TabContent({ tab }: { tab: Tab }) {
   switch (tab) {
     case 'graph':
       return (
-        <Suspense fallback={<LoadingFallback />}>
-          <GraphView />
-        </Suspense>
+        <div className="flex h-full flex-col">
+          <FilterPanel />
+          <div className="flex-1 overflow-hidden">
+            <Suspense fallback={<LoadingFallback />}>
+              <GraphView />
+            </Suspense>
+          </div>
+        </div>
       )
     case 'timeline':
       return <MemoryTimeline />
@@ -298,9 +303,6 @@ export default function App() {
           </div>
         </div>
       </header>
-
-      {/* Filter panel (visible on graph tab) */}
-      {activeTab === 'graph' && <FilterPanel />}
 
       {/* Tab navigation */}
       <nav
