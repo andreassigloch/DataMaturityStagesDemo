@@ -41,7 +41,8 @@ export async function analyzeCentrality(
   options?: { limit?: number; nodeLabel?: string }
 ): Promise<CentralityResult> {
   const session = driver.session({ defaultAccessMode: 'READ' });
-  const limit = options?.limit ?? 5;
+  // Ensure limit is integer (Neo4j LIMIT requires integer, not float)
+  const limit = Math.floor(options?.limit ?? 5);
   const nodeLabel = options?.nodeLabel;
 
   try {
