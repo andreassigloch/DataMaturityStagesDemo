@@ -7,14 +7,14 @@ import { useMemo } from 'react'
 import { useDashboardStore } from '../stores/dashboardStore'
 import type { CentralityMetrics, NodeType } from '../schemas'
 
-// Node type colors matching backend schema (7 types)
+// Node type colors matching backend schema (7 types, WCAG AA compliant)
 const TYPE_COLORS: Record<NodeType, string> = {
   StakeholderReq: '#4A90D9',
   SystemReq: '#7CB342',
   SoftwareReq: '#FF9800',
   HardwareReq: '#0EA5E9',
-  TestCase: '#9C27B0',
-  InputSpec: '#a1887f',  // WCAG AA compliant
+  TestCase: '#BA68C8',   // WCAG AA (was #9C27B0)
+  InputSpec: '#a1887f',  // WCAG AA (was #795548)
   Regel: '#A855F7',
 }
 

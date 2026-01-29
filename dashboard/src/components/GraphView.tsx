@@ -10,14 +10,14 @@ import { DataSet } from 'vis-data'
 import { useDashboardStore } from '../stores/dashboardStore'
 import type { GraphNode, NodeType } from '../schemas'
 
-// Node colors matching backend schema (7 types)
+// Node colors matching backend schema (7 types, WCAG AA compliant)
 const NODE_COLORS: Record<NodeType, string> = {
   StakeholderReq: '#4A90D9',   // Blue
   SystemReq: '#7CB342',        // Green
   SoftwareReq: '#FF9800',      // Orange
   HardwareReq: '#0EA5E9',      // Sky
-  TestCase: '#9C27B0',         // Purple
-  InputSpec: '#a1887f',        // Brown (WCAG AA compliant)
+  TestCase: '#BA68C8',         // Purple (WCAG AA, was #9C27B0)
+  InputSpec: '#a1887f',        // Brown (WCAG AA, was #795548)
   Regel: '#A855F7',            // Violet
 }
 
