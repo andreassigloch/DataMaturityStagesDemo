@@ -356,6 +356,61 @@ CREATE (sw2)-[:DEPENDS_ON {
 }]->(ext3);
 
 // =====================================================
-// KEINE REGELN VORINSTALLIERT!
-// Die werden in der Demo live aus PDFs erstellt.
+// VALIDIERUNGSREGELN (Regel-Knoten)
+// Abgeleitet aus A-SPICE und ISO 26262
 // =====================================================
+
+CREATE (reg1:Regel {
+  id: 'REG-001',
+  name: 'Traceability-Vollstaendigkeit',
+  typ: 'Traceability',
+  cypher: 'MATCH (sw:SoftwareReq) WHERE NOT (sw)-[:TRACED_TO]->(:SystemReq) RETURN sw.id AS violation, sw.titel AS beschreibung',
+  schwere: 'fehler',
+  standard: 'A-SPICE',
+  aktiv: true,
+  createdAt: datetime()
+})
+
+CREATE (reg2:Regel {
+  id: 'REG-002',
+  name: 'Test-Coverage',
+  typ: 'Coverage',
+  cypher: 'MATCH (sw:SoftwareReq) WHERE NOT (sw)-[:VERIFIED_BY]->(:TestCase) RETURN sw.id AS violation, sw.titel AS beschreibung',
+  schwere: 'fehler',
+  standard: 'A-SPICE',
+  aktiv: true,
+  createdAt: datetime()
+})
+
+CREATE (reg3:Regel {
+  id: 'REG-003',
+  name: 'Vage Zeitangaben',
+  typ: 'Quality',
+  cypher: 'MATCH (n) WHERE n.beschreibung =~ \".*schnell.*\" OR n.beschreibung =~ \".*bald.*\" OR n.beschreibung =~ \".*zeitnah.*\" RETURN n.id AS violation, n.beschreibung AS beschreibung',
+  schwere: 'warnung',
+  standard: 'ISO 26262',
+  aktiv: true,
+  createdAt: datetime()
+})
+
+CREATE (reg4:Regel {
+  id: 'REG-004',
+  name: 'Externe Abhaengigkeiten dokumentiert',
+  typ: 'Traceability',
+  cypher: 'MATCH (sys:SystemReq) WHERE sys.beschreibung CONTAINS \"CAN\" AND NOT (sys)-[:DEPENDS_ON]->(:InputSpec) RETURN sys.id AS violation, sys.titel AS beschreibung',
+  schwere: 'warnung',
+  standard: 'A-SPICE',
+  aktiv: true,
+  createdAt: datetime()
+})
+
+CREATE (reg5:Regel {
+  id: 'REG-005',
+  name: 'ASIL-Klassifizierung',
+  typ: 'Safety',
+  cypher: 'MATCH (sys:SystemReq) WHERE sys.asil IS NULL AND sys.beschreibung CONTAINS \"Brems\" RETURN sys.id AS violation, sys.titel AS beschreibung',
+  schwere: 'fehler',
+  standard: 'ISO 26262',
+  aktiv: false,
+  createdAt: datetime()
+});

@@ -32,16 +32,28 @@ router.get('/', async (_req: Request, res: Response): Promise<void> => {
       ORDER BY r.standard, r.name
     `);
 
-    const rules = result.records.map(record => ({
-      id: record.get('id') as string,
-      name: record.get('name') as string,
-      typ: record.get('typ') as string,
-      cypher: record.get('cypher') as string,
-      schwere: record.get('schwere') as 'fehler' | 'warnung',
-      standard: record.get('standard') as string,
-      aktiv: record.get('aktiv') as boolean,
-      createdAt: record.get('createdAt') as string | undefined,
-    }));
+    const rules = result.records.map(record => {
+      const createdAtRaw = record.get('createdAt');
+      let createdAt: string | undefined;
+      if (createdAtRaw) {
+        // Handle Neo4j DateTime object
+        if (typeof createdAtRaw === 'object' && 'toStandardDate' in createdAtRaw) {
+          createdAt = (createdAtRaw as { toStandardDate: () => Date }).toStandardDate().toISOString();
+        } else if (typeof createdAtRaw === 'string') {
+          createdAt = createdAtRaw;
+        }
+      }
+      return {
+        id: record.get('id') as string,
+        name: record.get('name') as string,
+        typ: record.get('typ') as string,
+        cypher: record.get('cypher') as string,
+        schwere: record.get('schwere') as 'fehler' | 'warnung',
+        standard: record.get('standard') as string,
+        aktiv: record.get('aktiv') as boolean,
+        createdAt,
+      };
+    });
 
     // Calculate stats
     const byStandard: Record<string, number> = {};
