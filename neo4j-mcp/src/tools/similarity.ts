@@ -108,7 +108,7 @@ export async function findSimilarRequirements(
         COALESCE(sameASIL, false) AS sameASIL,
         COALESCE(sameStandard, false) AS sameStandard
       ORDER BY similarity DESC
-      LIMIT $limit
+      LIMIT toInteger($limit)
     `, { requirementId, limit, minSimilarity });
 
     const similarRequirements: SimilarRequirement[] = similarResult.records.map(record => ({

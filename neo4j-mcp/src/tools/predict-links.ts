@@ -68,7 +68,7 @@ export async function predictMissingLinks(
           ELSE 0.6
         END AS confidence,
         'Pattern: Alle anderen SoftwareReqs in der Komponente haben Tests' AS reason
-      LIMIT $limit
+      LIMIT toInteger($limit)
     `, { limit });
 
     for (const record of missingTests.records) {
@@ -102,7 +102,7 @@ export async function predictMissingLinks(
         'SystemReq' AS targetType,
         0.72 AS confidence,
         'Pattern: StakeholderReq ohne System-Ableitung' AS reason
-      LIMIT $limit
+      LIMIT toInteger($limit)
     `, { limit });
 
     for (const record of missingDerivation.records) {
@@ -136,7 +136,7 @@ export async function predictMissingLinks(
         'InputSpec' AS targetType,
         0.65 AS confidence,
         'Pattern: SystemReq erwähnt CAN aber keine DEPENDS_ON Beziehung' AS reason
-      LIMIT $limit
+      LIMIT toInteger($limit)
     `, { limit });
 
     for (const record of missingExternalDeps.records) {

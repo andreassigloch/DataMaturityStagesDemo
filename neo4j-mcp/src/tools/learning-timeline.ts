@@ -57,7 +57,7 @@ export async function getLearningTimeline(
         le.description AS description,
         le.confidence AS confidence
       ORDER BY le.timestamp DESC
-      LIMIT $limit
+      LIMIT toInteger($limit)
     `, { limit });
 
     const events: TimelineEvent[] = eventsResult.records.map(record => ({
@@ -80,7 +80,7 @@ export async function getLearningTimeline(
           'Feedback: ' + f.issue AS description,
           null AS confidence
         ORDER BY f.createdAt DESC
-        LIMIT $limit
+        LIMIT toInteger($limit)
 
         UNION ALL
 
@@ -94,7 +94,7 @@ export async function getLearningTimeline(
           'Pattern erkannt: ' + p.name AS description,
           p.confidence AS confidence
         ORDER BY p.lastSeen DESC
-        LIMIT $limit
+        LIMIT toInteger($limit)
       `, { limit });
 
       for (const record of fallbackResult.records) {

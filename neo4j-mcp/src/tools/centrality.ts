@@ -82,7 +82,7 @@ export async function analyzeCentrality(
         YIELD nodeId, score
         RETURN gds.util.asNode(nodeId) AS node, score
         ORDER BY score DESC
-        LIMIT $limit
+        LIMIT toInteger($limit)
       `, { projectionName, limit });
 
       // Run Betweenness
@@ -91,7 +91,7 @@ export async function analyzeCentrality(
         YIELD nodeId, score
         RETURN gds.util.asNode(nodeId) AS node, score
         ORDER BY score DESC
-        LIMIT $limit
+        LIMIT toInteger($limit)
       `, { projectionName, limit });
 
       // Get statistics
@@ -191,7 +191,7 @@ async function analyzeWithoutGDS(
       OPTIONAL MATCH (n)-[r]-()
       WITH n, count(r) AS degree
       ORDER BY degree DESC
-      LIMIT $limit
+      LIMIT toInteger($limit)
       RETURN
         n.id AS id,
         COALESCE(n.titel, n.name, n.id) AS name,
