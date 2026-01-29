@@ -3,10 +3,10 @@
  * @author andreas@siglochconsulting
  */
 
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { useDashboardStore } from './stores/dashboardStore'
 import { useSSE } from './hooks/useSSE'
-import { useGraphData } from './hooks/useGraphData'
+import { useGraphData, useCentralityMetrics } from './hooks/useGraphData'
 import { MemoryTimeline, CentralityPanel, PatternList, RulesPanel } from './components'
 import type { Tab } from './schemas'
 
@@ -16,7 +16,7 @@ const GraphView = lazy(() => import('./components/GraphView'))
 const TABS: { id: Tab; label: string; icon: React.ReactElement }[] = [
   {
     id: 'graph',
-    label: 'Knowledge Graph',
+    label: 'Übersicht',
     icon: (
       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -30,7 +30,7 @@ const TABS: { id: Tab; label: string; icon: React.ReactElement }[] = [
   },
   {
     id: 'timeline',
-    label: 'Learning Timeline',
+    label: 'Lernverlauf',
     icon: (
       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -44,7 +44,7 @@ const TABS: { id: Tab; label: string; icon: React.ReactElement }[] = [
   },
   {
     id: 'centrality',
-    label: 'Centrality Metrics',
+    label: 'Wichtigkeit',
     icon: (
       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -58,7 +58,7 @@ const TABS: { id: Tab; label: string; icon: React.ReactElement }[] = [
   },
   {
     id: 'patterns',
-    label: 'Detected Patterns',
+    label: 'Qualitätsprobleme',
     icon: (
       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -72,7 +72,7 @@ const TABS: { id: Tab; label: string; icon: React.ReactElement }[] = [
   },
   {
     id: 'rules',
-    label: 'Rules',
+    label: 'Prüfregeln',
     icon: (
       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -227,9 +227,12 @@ export default function App() {
 
   // Fetch initial data
   const { refetch: refetchGraph } = useGraphData({ autoFetch: true })
-  // TODO: Add /api/centrality and /api/patterns routes
-  // const { fetchCentrality } = useCentralityMetrics()
-  // const { fetchPatterns } = usePatterns()
+  const { fetchCentrality } = useCentralityMetrics()
+
+  // Fetch centrality metrics on mount
+  useEffect(() => {
+    fetchCentrality()
+  }, [fetchCentrality])
 
   return (
     <div

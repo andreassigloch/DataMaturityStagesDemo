@@ -13,6 +13,7 @@ import memoryRoutes from './routes/memory.js';
 import eventsRoutes from './routes/events.js';
 import feedbackRoutes from './routes/feedback.js';
 import rulesRoutes from './routes/rules.js';
+import centralityRoutes from './routes/centrality.js';
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
 const HOST = process.env.HOST || '0.0.0.0';
@@ -48,6 +49,7 @@ app.use('/api/memory', memoryRoutes);
 app.use('/api/events', eventsRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/rules', rulesRoutes);
+app.use('/api/centrality', centralityRoutes);
 
 // Error handling
 app.use(notFoundHandler);
@@ -79,6 +81,7 @@ async function start(): Promise<void> {
     POST /api/feedback   - Record feedback
     GET  /api/feedback   - List feedback
     GET  /api/rules      - Validation rules
+    GET  /api/centrality  - Centrality metrics
 ========================================
 `);
     });
