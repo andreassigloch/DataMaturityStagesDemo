@@ -10,18 +10,14 @@ import { DataSet } from 'vis-data'
 import { useDashboardStore } from '../stores/dashboardStore'
 import type { GraphNode, NodeType } from '../schemas'
 
-// CR-009 Node colors matching Requirements Traceability
+// Node colors matching backend schema (7 types)
 const NODE_COLORS: Record<NodeType, string> = {
   StakeholderReq: '#4A90D9',   // Blue
   SystemReq: '#7CB342',        // Green
   SoftwareReq: '#FF9800',      // Orange
   HardwareReq: '#0EA5E9',      // Sky
   TestCase: '#9C27B0',         // Purple
-  InputSpec: '#795548',        // Brown
-  Komponente: '#607D8B',       // Blue Grey
-  Pattern: '#E91E63',          // Pink
-  Feedback: '#00BCD4',         // Cyan
-  LearningEvent: '#FFC107',    // Amber
+  InputSpec: '#a1887f',        // Brown (WCAG AA compliant)
   Regel: '#A855F7',            // Violet
 }
 
@@ -32,10 +28,6 @@ const NODE_SHAPES: Record<NodeType, string> = {
   HardwareReq: 'box',
   TestCase: 'diamond',
   InputSpec: 'triangle',
-  Komponente: 'hexagon',
-  Pattern: 'star',
-  Feedback: 'dot',
-  LearningEvent: 'triangleDown',
   Regel: 'square',
 }
 

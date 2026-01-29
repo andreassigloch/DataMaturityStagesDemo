@@ -5,7 +5,7 @@
 
 import { z } from 'zod'
 
-// Node types matching CR-009 Requirements Traceability
+// Node types matching backend schema (source of truth)
 export const NodeTypeSchema = z.enum([
   'StakeholderReq',
   'SystemReq',
@@ -13,10 +13,6 @@ export const NodeTypeSchema = z.enum([
   'HardwareReq',
   'TestCase',
   'InputSpec',
-  'Komponente',
-  'Pattern',
-  'Feedback',
-  'LearningEvent',
   'Regel',
 ])
 export type NodeType = z.infer<typeof NodeTypeSchema>
