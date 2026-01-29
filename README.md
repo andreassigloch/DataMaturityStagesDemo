@@ -67,6 +67,32 @@ MATCH (n)-[:DEPENDS_ON]->(ext:InputSpec)
 RETURN n.id, ext.id, ext.quelle;
 ```
 
+## Dashboard (Stufe 6-7)
+
+Das Dashboard visualisiert ML-Metriken und Learning Events für die Demo.
+
+```bash
+# Starten
+cd dashboard
+npm run dev          # Frontend auf http://localhost:5175
+cd server && npm run dev  # Backend auf http://localhost:3001
+```
+
+### Features
+
+| Tab | Funktion |
+|-----|----------|
+| Knowledge Graph | vis-network Visualisierung mit Centrality-Größen |
+| Learning Timeline | Chronologische Memory Events |
+| Centrality Metrics | PageRank/Betweenness Tabelle |
+| Detected Patterns | Anti-Pattern Liste |
+
+### API Endpoints
+
+- `GET /api/graph` - Graph-Daten mit Centrality-Scores
+- `GET /api/events` - SSE für Real-time Updates
+- `POST /api/feedback` - Feedback speichern
+
 ## Container-Verwaltung
 
 ```bash
@@ -160,7 +186,9 @@ Füge folgendes zu `~/Library/Application Support/Claude/claude_desktop_config.j
 | Neo4j Auth Fehler | Container nicht gestartet | `docker-compose up -d` ausführen |
 | Logs prüfen | - | Claude Desktop > Settings > Developer > neo4j-requirements > Logs |
 
-### Verfügbare MCP-Tools
+### Verfügbare MCP-Tools (12 Tools)
+
+#### Stufe 3-5: Knowledge Graph & Regeln
 
 | Tool | Beschreibung |
 |------|--------------|
@@ -170,6 +198,23 @@ Füge folgendes zu `~/Library/Application Support/Claude/claude_desktop_config.j
 | `add_rule` | Neue Validierungsregel hinzufügen |
 | `toggle_rule` | Regel aktivieren/deaktivieren |
 | `compliance_score` | Compliance-Score pro Standard berechnen |
+
+#### Stufe 6: ML & Prediction (CR-009)
+
+| Tool | Beschreibung |
+|------|--------------|
+| `centrality_analysis` | PageRank/Betweenness für kritische Requirements |
+| `predict_missing_links` | Fehlende Traceability-Links vorhersagen |
+| `find_similar_requirements` | Strukturell ähnliche Requirements finden (Jaccard) |
+
+#### Stufe 7: Learning System (CR-009)
+
+| Tool | Beschreibung |
+|------|--------------|
+| `record_feedback` | Feedback zu Requirements speichern |
+| `detect_patterns` | Anti-Patterns erkennen (vage Zeitangaben, etc.) |
+| `learning_timeline` | Chronologische Learning Events anzeigen |
+| `memory_stats` | System-Gedächtnis Statistiken |
 
 ## Projektstruktur
 
@@ -243,9 +288,10 @@ Settings > Developer > neo4j-requirements > Logs
 ## Abnahmekriterien
 
 - [x] Neo4j startet mit `docker-compose up`
-- [x] MCP-Server implementiert (6 Tools)
+- [x] MCP-Server implementiert (12 Tools: 6 Basis + 6 CR-009)
 - [x] Seed-Daten mit absichtlichen Lücken
 - [x] Demo-Script für 20-Min Präsentation
 - [x] Demo-PDFs für Stufe 1-2
 - [x] Ausblick-Folien für Stufe 6-7
 - [x] Sicherheitskonzept (DB-Fingerprint, Query-Sanitization)
+- [x] Dashboard für Stufe 6-7 Visualisierung (CR-009)
