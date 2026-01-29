@@ -4,10 +4,7 @@
  */
 
 import { useMemo } from 'react'
-import {
-  useDashboardStore,
-  selectSortedCentrality,
-} from '../stores/dashboardStore'
+import { useDashboardStore } from '../stores/dashboardStore'
 import type { CentralityMetrics, NodeType } from '../schemas'
 
 // CR-009 Node type colors
@@ -168,7 +165,7 @@ function NodeRow({ node, maxValues, onSelect, isSelected }: NodeRowProps) {
 }
 
 export function CentralityPanel() {
-  const sortedMetrics = useDashboardStore(selectSortedCentrality)
+  const centralityMetrics = useDashboardStore((s) => s.centralityMetrics)
   const sortBy = useDashboardStore((s) => s.sortBy)
   const sortDirection = useDashboardStore((s) => s.sortDirection)
   const setSortBy = useDashboardStore((s) => s.setSortBy)
@@ -176,6 +173,21 @@ export function CentralityPanel() {
   const selectedNodeId = useDashboardStore((s) => s.selectedNodeId)
   const selectNode = useDashboardStore((s) => s.selectNode)
   const highlightNodes = useDashboardStore((s) => s.highlightNodes)
+
+  // Memoize sorted metrics to prevent infinite loop
+  const sortedMetrics = useMemo(() => {
+    return [...centralityMetrics].sort((a, b) => {
+      const aVal = a[sortBy]
+      const bVal = b[sortBy]
+      if (typeof aVal === 'number' && typeof bVal === 'number') {
+        return sortDirection === 'asc' ? aVal - bVal : bVal - aVal
+      }
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return sortDirection === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal)
+      }
+      return 0
+    })
+  }, [centralityMetrics, sortBy, sortDirection])
 
   // Calculate max values for bar scaling
   const maxValues = useMemo(() => {

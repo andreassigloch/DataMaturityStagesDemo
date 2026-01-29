@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(npx @claude-flow/cli@latest swarm init:*)",
-      "Bash(npx @claude-flow/cli@latest hooks pre-task:*)"
+      "Bash(npx @claude-flow/cli@latest hooks pre-task:*)",
+      "Bash(tree:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
