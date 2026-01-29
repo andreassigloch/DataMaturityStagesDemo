@@ -145,10 +145,11 @@ export function GraphView() {
           roundness: 0.5,
         },
         font: {
-          size: 9, // Smaller edge labels
+          size: 9,
           color: '#94a3b8',
           face: 'Inter, system-ui, sans-serif',
           align: 'middle',
+          strokeWidth: 0, // No outline
         },
         color: {
           color: '#64748b',
