@@ -14,16 +14,15 @@ import {
 
 describe('NodeTypeSchema', () => {
   it('accepts valid CR-009 node types', () => {
+    // 7 types matching backend schema
     const validTypes = [
       'StakeholderReq',
       'SystemReq',
       'SoftwareReq',
+      'HardwareReq',
       'TestCase',
       'InputSpec',
-      'Komponente',
-      'Pattern',
-      'Feedback',
-      'LearningEvent',
+      'Regel',
     ]
 
     for (const type of validTypes) {
@@ -60,11 +59,11 @@ describe('GraphNodeSchema', () => {
     expect(result.success).toBe(true)
   })
 
-  it('validates Pattern node with hasPatternMatch', () => {
+  it('validates Regel node', () => {
     const node = {
-      id: 'PAT-001',
+      id: 'REG-001',
       label: 'Vage Zeitangabe',
-      type: 'Pattern',
+      type: 'Regel',
     }
     const result = GraphNodeSchema.safeParse(node)
     expect(result.success).toBe(true)
