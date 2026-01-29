@@ -12,6 +12,7 @@ import graphRoutes from './routes/graph.js';
 import memoryRoutes from './routes/memory.js';
 import eventsRoutes from './routes/events.js';
 import feedbackRoutes from './routes/feedback.js';
+import rulesRoutes from './routes/rules.js';
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
 const HOST = process.env.HOST || '0.0.0.0';
@@ -46,6 +47,7 @@ app.use('/api/graph', graphRoutes);
 app.use('/api/memory', memoryRoutes);
 app.use('/api/events', eventsRoutes);
 app.use('/api/feedback', feedbackRoutes);
+app.use('/api/rules', rulesRoutes);
 
 // Error handling
 app.use(notFoundHandler);
@@ -76,6 +78,7 @@ async function start(): Promise<void> {
     GET  /api/events     - SSE stream
     POST /api/feedback   - Record feedback
     GET  /api/feedback   - List feedback
+    GET  /api/rules      - Validation rules
 ========================================
 `);
     });

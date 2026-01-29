@@ -15,22 +15,20 @@ const NODE_COLORS: Record<NodeType, string> = {
   StakeholderReq: '#4A90D9',   // Blue
   SystemReq: '#7CB342',        // Green
   SoftwareReq: '#FF9800',      // Orange
-  HardwareReq: '#0EA5E9',      // Sky
-  TestCase: '#BA68C8',         // Purple (WCAG AA, was #9C27B0)
-  InputSpec: '#a1887f',        // Brown (WCAG AA, was #795548)
+  TestCase: '#BA68C8',         // Purple (WCAG AA)
+  InputSpec: '#a1887f',        // Brown (WCAG AA)
   Komponente: '#78909c',       // Gray-blue (WCAG AA)
-  Regel: '#A855F7',            // Violet
+  Feedback: '#F472B6',         // Pink (WCAG AA)
 }
 
 const NODE_SHAPES: Record<NodeType, string> = {
   StakeholderReq: 'box',
   SystemReq: 'box',
   SoftwareReq: 'box',
-  HardwareReq: 'box',
   TestCase: 'diamond',
   InputSpec: 'triangle',
   Komponente: 'hexagon',
-  Regel: 'square',
+  Feedback: 'star',
 }
 
 interface VisNode {

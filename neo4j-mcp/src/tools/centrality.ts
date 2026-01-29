@@ -58,8 +58,8 @@ export async function analyzeCentrality(
       return await analyzeWithoutGDS(driver, limit, nodeLabel);
     }
 
-    // Create projection - must match 7-type schema (CR-009)
-    const labelFilter = nodeLabel ? `['${nodeLabel}']` : "['StakeholderReq', 'SystemReq', 'SoftwareReq', 'HardwareReq', 'TestCase', 'InputSpec', 'Regel']";
+    // Create projection - must match actual database labels
+    const labelFilter = nodeLabel ? `['${nodeLabel}']` : "['StakeholderReq', 'SystemReq', 'SoftwareReq', 'TestCase', 'InputSpec', 'Komponente', 'Feedback']";
 
     await session.run(`
       CALL gds.graph.project(

@@ -12,7 +12,7 @@ import { z } from 'zod';
 export const GraphNodeSchema = z.object({
   id: z.string(),
   label: z.string(),
-  type: z.enum(['StakeholderReq', 'SystemReq', 'SoftwareReq', 'HardwareReq', 'TestCase', 'InputSpec', 'Komponente', 'Regel']),
+  type: z.enum(['StakeholderReq', 'SystemReq', 'SoftwareReq', 'TestCase', 'InputSpec', 'Komponente', 'Feedback']),
   title: z.string(),
   centrality: z.number().min(0).max(1),
   properties: z.record(z.unknown()).optional(),
@@ -39,6 +39,34 @@ export const GraphResponseSchema = z.object({
 export type GraphNode = z.infer<typeof GraphNodeSchema>;
 export type GraphEdge = z.infer<typeof GraphEdgeSchema>;
 export type GraphResponse = z.infer<typeof GraphResponseSchema>;
+
+// ============================================================================
+// Rules (Regel) Schemas - separate from graph visualization
+// ============================================================================
+
+export const RegelSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  typ: z.string(),
+  cypher: z.string(),
+  schwere: z.enum(['fehler', 'warnung']),
+  standard: z.string(),
+  aktiv: z.boolean(),
+  createdAt: z.string().datetime().optional(),
+});
+
+export const RulesResponseSchema = z.object({
+  rules: z.array(RegelSchema),
+  stats: z.object({
+    total: z.number(),
+    active: z.number(),
+    byStandard: z.record(z.number()),
+    bySchwere: z.record(z.number()),
+  }),
+});
+
+export type Regel = z.infer<typeof RegelSchema>;
+export type RulesResponse = z.infer<typeof RulesResponseSchema>;
 
 // ============================================================================
 // Memory/Learning Schemas

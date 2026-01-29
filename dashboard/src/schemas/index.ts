@@ -10,11 +10,10 @@ export const NodeTypeSchema = z.enum([
   'StakeholderReq',
   'SystemReq',
   'SoftwareReq',
-  'HardwareReq',
   'TestCase',
   'InputSpec',
   'Komponente',
-  'Regel',
+  'Feedback',
 ])
 export type NodeType = z.infer<typeof NodeTypeSchema>
 
@@ -147,7 +146,7 @@ export const SSEEventSchema = z.discriminatedUnion('type', [
 export type SSEEvent = z.infer<typeof SSEEventSchema>
 
 // Tab configuration
-export const TabSchema = z.enum(['graph', 'timeline', 'centrality', 'patterns'])
+export const TabSchema = z.enum(['graph', 'timeline', 'centrality', 'patterns', 'rules'])
 export type Tab = z.infer<typeof TabSchema>
 
 // Filter state

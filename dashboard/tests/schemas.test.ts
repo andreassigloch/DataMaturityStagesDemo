@@ -19,11 +19,10 @@ describe('NodeTypeSchema', () => {
       'StakeholderReq',
       'SystemReq',
       'SoftwareReq',
-      'HardwareReq',
       'TestCase',
       'InputSpec',
       'Komponente',
-      'Regel',
+      'Feedback',
     ]
 
     for (const type of validTypes) {
@@ -60,11 +59,11 @@ describe('GraphNodeSchema', () => {
     expect(result.success).toBe(true)
   })
 
-  it('validates Regel node', () => {
+  it('validates Feedback node', () => {
     const node = {
-      id: 'REG-001',
-      label: 'Vage Zeitangabe',
-      type: 'Regel',
+      id: 'FB-001',
+      label: 'Review Feedback',
+      type: 'Feedback',
     }
     const result = GraphNodeSchema.safeParse(node)
     expect(result.success).toBe(true)

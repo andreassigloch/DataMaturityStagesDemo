@@ -11,7 +11,7 @@ import { z } from 'zod'
 const GraphNodeSchema = z.object({
   id: z.string(),
   label: z.string(),
-  type: z.enum(['StakeholderReq', 'SystemReq', 'SoftwareReq', 'HardwareReq', 'TestCase', 'InputSpec', 'Komponente', 'Regel']),
+  type: z.enum(['StakeholderReq', 'SystemReq', 'SoftwareReq', 'TestCase', 'InputSpec', 'Komponente', 'Feedback']),
   title: z.string(),
   centrality: z.number().min(0).max(1),
   properties: z.record(z.string(), z.unknown()).optional(),
@@ -70,7 +70,7 @@ describe('Graph API Integration', () => {
     const response = await fetch(`${API_BASE}/api/graph`)
     const data = await response.json()
 
-    const validTypes = ['StakeholderReq', 'SystemReq', 'SoftwareReq', 'HardwareReq', 'TestCase', 'InputSpec', 'Komponente', 'Regel']
+    const validTypes = ['StakeholderReq', 'SystemReq', 'SoftwareReq', 'TestCase', 'InputSpec', 'Komponente', 'Feedback']
 
     for (const node of data.nodes) {
       expect(validTypes).toContain(node.type)

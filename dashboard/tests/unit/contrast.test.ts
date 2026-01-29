@@ -10,11 +10,10 @@ const NODE_COLORS: Record<string, string> = {
   StakeholderReq: '#4A90D9',
   SystemReq: '#7CB342',
   SoftwareReq: '#FF9800',
-  HardwareReq: '#0EA5E9',
-  TestCase: '#BA68C8',   // WCAG AA (was #9C27B0)
-  InputSpec: '#a1887f',  // WCAG AA (was #795548)
+  TestCase: '#BA68C8',   // WCAG AA
+  InputSpec: '#a1887f',  // WCAG AA
   Komponente: '#78909c', // WCAG AA gray-blue
-  Regel: '#A855F7',
+  Feedback: '#F472B6',   // WCAG AA pink
 }
 
 // Background color (dark theme)
