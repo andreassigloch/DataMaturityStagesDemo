@@ -13,6 +13,7 @@ const NODE_COLORS: Record<string, string> = {
   HardwareReq: '#0EA5E9',
   TestCase: '#BA68C8',   // WCAG AA (was #9C27B0)
   InputSpec: '#a1887f',  // WCAG AA (was #795548)
+  Komponente: '#78909c', // WCAG AA gray-blue
   Regel: '#A855F7',
 }
 

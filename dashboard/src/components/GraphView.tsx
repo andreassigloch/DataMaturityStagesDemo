@@ -18,6 +18,7 @@ const NODE_COLORS: Record<NodeType, string> = {
   HardwareReq: '#0EA5E9',      // Sky
   TestCase: '#BA68C8',         // Purple (WCAG AA, was #9C27B0)
   InputSpec: '#a1887f',        // Brown (WCAG AA, was #795548)
+  Komponente: '#78909c',       // Gray-blue (WCAG AA)
   Regel: '#A855F7',            // Violet
 }
 
@@ -28,6 +29,7 @@ const NODE_SHAPES: Record<NodeType, string> = {
   HardwareReq: 'box',
   TestCase: 'diamond',
   InputSpec: 'triangle',
+  Komponente: 'hexagon',
   Regel: 'square',
 }
 

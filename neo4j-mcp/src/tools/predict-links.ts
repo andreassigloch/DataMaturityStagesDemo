@@ -51,8 +51,8 @@ export async function predictMissingLinks(
     const missingTests = await session.run(`
       MATCH (sw:SoftwareReq)
       WHERE NOT (sw)-[:VERIFIED_BY]->(:TestCase)
-      // Find similar SoftwareReqs that have tests
-      OPTIONAL MATCH (sw)-[:IMPLEMENTED_IN]->(:Komponente)<-[:IMPLEMENTED_IN]-(sibling:SoftwareReq)-[:VERIFIED_BY]->(tc:TestCase)
+      // Find similar SoftwareReqs that have tests (via shared SystemReq parent)
+      OPTIONAL MATCH (sw)<-[:TRACED_TO]-(:SystemReq)-[:TRACED_TO]->(sibling:SoftwareReq)-[:VERIFIED_BY]->(tc:TestCase)
       WITH sw, collect(DISTINCT tc) AS relatedTests, count(DISTINCT sibling) AS siblingCount
       WHERE siblingCount > 0
       RETURN

@@ -12,7 +12,7 @@ import { z } from 'zod';
 export const GraphNodeSchema = z.object({
   id: z.string(),
   label: z.string(),
-  type: z.enum(['StakeholderReq', 'SystemReq', 'SoftwareReq', 'HardwareReq', 'TestCase', 'InputSpec', 'Regel']),
+  type: z.enum(['StakeholderReq', 'SystemReq', 'SoftwareReq', 'HardwareReq', 'TestCase', 'InputSpec', 'Komponente', 'Regel']),
   title: z.string(),
   centrality: z.number().min(0).max(1),
   properties: z.record(z.unknown()).optional(),

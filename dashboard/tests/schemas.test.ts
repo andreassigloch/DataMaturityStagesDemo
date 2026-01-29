@@ -22,6 +22,7 @@ describe('NodeTypeSchema', () => {
       'HardwareReq',
       'TestCase',
       'InputSpec',
+      'Komponente',
       'Regel',
     ]
 

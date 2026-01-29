@@ -21,7 +21,7 @@ router.get('/', async (_req: Request, res: Response): Promise<void> => {
     // Fetch all nodes with their labels and properties, including degree centrality
     const nodesResult = await session.run(`
       MATCH (n)
-      WHERE n:StakeholderReq OR n:SystemReq OR n:SoftwareReq OR n:HardwareReq OR n:TestCase OR n:InputSpec OR n:Regel
+      WHERE n:StakeholderReq OR n:SystemReq OR n:SoftwareReq OR n:HardwareReq OR n:TestCase OR n:InputSpec OR n:Komponente OR n:Regel
       WITH n, labels(n)[0] AS nodeType
       OPTIONAL MATCH (n)-[r]-()
       WITH n, nodeType, count(r) AS degree
@@ -61,8 +61,8 @@ router.get('/', async (_req: Request, res: Response): Promise<void> => {
     // Fetch all relationships
     const edgesResult = await session.run(`
       MATCH (source)-[r:TRACED_TO|VERIFIED_BY|IMPLEMENTED_IN|DEPENDS_ON]->(target)
-      WHERE (source:StakeholderReq OR source:SystemReq OR source:SoftwareReq OR source:HardwareReq OR source:TestCase OR source:InputSpec)
-        AND (target:StakeholderReq OR target:SystemReq OR target:SoftwareReq OR target:HardwareReq OR target:TestCase OR target:InputSpec)
+      WHERE (source:StakeholderReq OR source:SystemReq OR source:SoftwareReq OR source:HardwareReq OR source:TestCase OR source:InputSpec OR source:Komponente)
+        AND (target:StakeholderReq OR target:SystemReq OR target:SoftwareReq OR target:HardwareReq OR target:TestCase OR target:InputSpec OR target:Komponente)
       RETURN
         toString(id(r)) AS relId,
         COALESCE(source.id, toString(id(source))) AS sourceId,
