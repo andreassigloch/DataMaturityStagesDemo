@@ -13,7 +13,6 @@ const NODE_COLORS: Record<string, string> = {
   TestCase: '#BA68C8',   // WCAG AA
   InputSpec: '#a1887f',  // WCAG AA
   Komponente: '#78909c', // WCAG AA gray-blue
-  Feedback: '#F472B6',   // WCAG AA pink
 }
 
 // Background color (dark theme)

@@ -7,7 +7,7 @@ import { useMemo } from 'react'
 import { useDashboardStore } from '../stores/dashboardStore'
 import type { CentralityMetrics, NodeType } from '../schemas'
 
-// Node type colors matching backend schema (7 types, WCAG AA compliant)
+// Node type colors matching backend schema (6 types, WCAG AA compliant)
 const TYPE_COLORS: Record<NodeType, string> = {
   StakeholderReq: '#4A90D9',
   SystemReq: '#7CB342',
@@ -15,7 +15,6 @@ const TYPE_COLORS: Record<NodeType, string> = {
   TestCase: '#BA68C8',   // WCAG AA
   InputSpec: '#a1887f',  // WCAG AA
   Komponente: '#78909c', // Gray-blue (WCAG AA)
-  Feedback: '#F472B6',   // Pink (WCAG AA)
 }
 
 interface MetricBarProps {

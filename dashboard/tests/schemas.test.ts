@@ -14,7 +14,7 @@ import {
 
 describe('NodeTypeSchema', () => {
   it('accepts valid CR-009 node types', () => {
-    // 7 types matching backend schema
+    // 6 graph types matching database (Regel in separate Rules tab)
     const validTypes = [
       'StakeholderReq',
       'SystemReq',
@@ -22,7 +22,6 @@ describe('NodeTypeSchema', () => {
       'TestCase',
       'InputSpec',
       'Komponente',
-      'Feedback',
     ]
 
     for (const type of validTypes) {
@@ -59,11 +58,11 @@ describe('GraphNodeSchema', () => {
     expect(result.success).toBe(true)
   })
 
-  it('validates Feedback node', () => {
+  it('validates Komponente node', () => {
     const node = {
-      id: 'FB-001',
-      label: 'Review Feedback',
-      type: 'Feedback',
+      id: 'K-001',
+      label: 'ECU Blinker',
+      type: 'Komponente',
     }
     const result = GraphNodeSchema.safeParse(node)
     expect(result.success).toBe(true)

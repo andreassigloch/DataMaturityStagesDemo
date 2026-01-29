@@ -18,7 +18,6 @@ const NODE_COLORS: Record<NodeType, string> = {
   TestCase: '#BA68C8',         // Purple (WCAG AA)
   InputSpec: '#a1887f',        // Brown (WCAG AA)
   Komponente: '#78909c',       // Gray-blue (WCAG AA)
-  Feedback: '#F472B6',         // Pink (WCAG AA)
 }
 
 const NODE_SHAPES: Record<NodeType, string> = {
@@ -28,7 +27,6 @@ const NODE_SHAPES: Record<NodeType, string> = {
   TestCase: 'diamond',
   InputSpec: 'triangle',
   Komponente: 'hexagon',
-  Feedback: 'star',
 }
 
 interface VisNode {

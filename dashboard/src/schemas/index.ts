@@ -13,7 +13,6 @@ export const NodeTypeSchema = z.enum([
   'TestCase',
   'InputSpec',
   'Komponente',
-  'Feedback',
 ])
 export type NodeType = z.infer<typeof NodeTypeSchema>
 
