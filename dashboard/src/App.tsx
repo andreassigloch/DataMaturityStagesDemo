@@ -3,10 +3,10 @@
  * @author andreas@siglochconsulting
  */
 
-import { useEffect, lazy, Suspense } from 'react'
+import { lazy, Suspense } from 'react'
 import { useDashboardStore } from './stores/dashboardStore'
 import { useSSE } from './hooks/useSSE'
-import { useGraphData, useCentralityMetrics, usePatterns } from './hooks/useGraphData'
+import { useGraphData } from './hooks/useGraphData'
 import { MemoryTimeline, CentralityPanel, PatternList } from './components'
 import type { Tab } from './schemas'
 
@@ -205,20 +205,15 @@ export default function App() {
 
   // Connect to SSE for real-time updates
   const { isConnected, reconnect } = useSSE({
-    url: '/events',
+    url: '/api/events',
     enabled: true,
   })
 
   // Fetch initial data
   const { refetch: refetchGraph } = useGraphData({ autoFetch: true })
-  const { fetchCentrality } = useCentralityMetrics()
-  const { fetchPatterns } = usePatterns()
-
-  // Fetch centrality and patterns on mount
-  useEffect(() => {
-    fetchCentrality()
-    fetchPatterns()
-  }, [fetchCentrality, fetchPatterns])
+  // TODO: Add /api/centrality and /api/patterns routes
+  // const { fetchCentrality } = useCentralityMetrics()
+  // const { fetchPatterns } = usePatterns()
 
   return (
     <div

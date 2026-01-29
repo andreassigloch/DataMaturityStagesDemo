@@ -3,11 +3,11 @@
  * @author andreas@siglochconsulting
  */
 
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useMemo } from 'react'
 import { Network } from 'vis-network'
 import type { Options, Data } from 'vis-network'
 import { DataSet } from 'vis-data'
-import { useDashboardStore, selectFilteredNodes } from '../stores/dashboardStore'
+import { useDashboardStore } from '../stores/dashboardStore'
 import type { GraphNode, NodeType } from '../schemas'
 
 // CR-009 Node colors matching Requirements Traceability
@@ -67,10 +67,23 @@ export function GraphView() {
   const edgesDataSetRef = useRef<DataSet<VisEdge> | null>(null)
 
   const graphData = useDashboardStore((s) => s.graphData)
-  const filteredNodes = useDashboardStore(selectFilteredNodes)
+  const filters = useDashboardStore((s) => s.filters)
   const highlightedNodes = useDashboardStore((s) => s.highlightedNodes)
   const selectedNodeId = useDashboardStore((s) => s.selectedNodeId)
   const selectNode = useDashboardStore((s) => s.selectNode)
+
+  // Memoize filtered nodes to prevent infinite loop
+  const filteredNodes = useMemo(() => {
+    const { nodes } = graphData
+    const { nodeTypes, minPageRank, minDegree, searchQuery } = filters
+    return nodes.filter((node) => {
+      if (!nodeTypes.includes(node.type)) return false
+      if (node.pageRank !== undefined && node.pageRank < minPageRank) return false
+      if (node.degree !== undefined && node.degree < minDegree) return false
+      if (searchQuery && !node.label.toLowerCase().includes(searchQuery.toLowerCase())) return false
+      return true
+    })
+  }, [graphData, filters])
 
   // Convert nodes to vis-network format
   const convertNodes = useCallback(
