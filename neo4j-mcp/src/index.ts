@@ -229,7 +229,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           type: 'object',
           properties: {
             limit: {
-              type: 'number',
+              type: 'integer',
               description: 'Anzahl Top-Ergebnisse (default: 5)'
             },
             nodeLabel: {
@@ -250,7 +250,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
               description: 'Minimale Konfidenz für Vorhersagen (default: 0.5)'
             },
             limit: {
-              type: 'number',
+              type: 'integer',
               description: 'Maximale Anzahl Vorhersagen (default: 10)'
             }
           }
@@ -267,7 +267,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
               description: 'ID des Referenz-Requirements'
             },
             limit: {
-              type: 'number',
+              type: 'integer',
               description: 'Anzahl ähnlicher Requirements (default: 5)'
             },
             minSimilarity: {
@@ -317,7 +317,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           type: 'object',
           properties: {
             limit: {
-              type: 'number',
+              type: 'integer',
               description: 'Anzahl Events (default: 50)'
             }
           }
