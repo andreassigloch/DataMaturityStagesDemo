@@ -1,6 +1,6 @@
 # Demo-Script: Requirements Traceability mit Knowledge Graph & Claude Desktop
 
-**Dauer:** 20 Minuten
+**Dauer:** 30 Minuten (20 Min Stufe 1-5, 10 Min Stufe 6-7)
 **Zielgruppe:** Engineering-Teams, PLM-Verantwortliche, Quality Manager
 **Setting:** Live-Demo mit Claude Desktop + Neo4j
 **Beispiel:** Automotive Außenlichtsystem (Blinker, Bremslicht, Warnblinker)
@@ -28,13 +28,18 @@ Claude Desktop erlaubt kein temporäres Deaktivieren von MCP-Servern - nur Lösc
 - [ ] **Docker Desktop** gestartet und running
 - [ ] **Neo4j Container** läuft:
   ```bash
-  cd demo-requirements-traceability
+  cd DataMaturityStages
   docker-compose up -d
   docker ps | grep req-traceability-neo4j
   ```
 - [ ] **Neo4j Browser** geöffnet: http://localhost:7484
   - Login: neo4j / demo-password
-  - Testquery: `MATCH (n) RETURN count(n)` → sollte ~26 Knoten zeigen
+  - Testquery: `MATCH (n) RETURN count(n)` → sollte ~27 Knoten zeigen
+- [ ] **Dashboard** läuft (für Stufe 6-7):
+  ```bash
+  cd dashboard && npm run dev          # Frontend: http://localhost:5175
+  cd dashboard/server && npm run dev   # Backend: http://localhost:3001
+  ```
 - [ ] **Claude Desktop** geöffnet
   - MCP-Status prüfen: Settings > Developer > "neo4j-requirements" muss grün sein
   - Falls rot: Claude Desktop mit Cmd+Q beenden, neu starten
@@ -43,7 +48,7 @@ Claude Desktop erlaubt kein temporäres Deaktivieren von MCP-Servern - nur Lösc
   - `a-spice-auszug.md`
   - `iso-26262-auszug.md`
   - `can-interface-spec.md`
-- [ ] **Zweiter Monitor** für Neo4j Browser (falls verfügbar)
+- [ ] **Zweiter Monitor** für Neo4j Browser / Dashboard (falls verfügbar)
 
 ### Schnelltest (2 Min)
 
@@ -284,20 +289,191 @@ WARNUNG: Das Außenlicht-Team wurde vermutlich NICHT informiert!
 
 ---
 
-### Ausblick: Stufe 6-7 (18:00 - 20:00)
+### Stufe 6: ML & Prediction (17:00 - 22:00)
+
+**🤖 MODUS: Knowledge Graph + ML (MCP-Tools nutzen)**
+
+> **An Publikum:** "Jetzt wird es spannend: Machine Learning auf dem Knowledge Graph."
 
 #### Aktion
-Datei `ausblick-folien/stufe-6-7-ausblick.md` zeigen.
+Dashboard öffnen: http://localhost:5175
+
+#### Claude-Befehl 1 (Centrality - WOW-Moment)
+```
+Welche Requirements sind am kritischsten? Nutze centrality_analysis.
+```
+
+#### Erwartetes Ergebnis
+```
+CENTRALITY ANALYSE:
+
+Top PageRank (Wichtigkeit):
+1. SYS-003 "Bremslicht <50ms" - Score: 0.42
+   → Viele eingehende Abhängigkeiten!
+
+Top Betweenness (Bottleneck):
+2. SW-002 "Bremslicht-Schwellwert" - Score: 0.38
+   → Liegt auf vielen kritischen Pfaden
+```
 
 #### Talking Points
 
-> "Was Sie gesehen haben ist Stufe 3-5. Das Fundament."
+> "PageRank - bekannt von Google - zeigt uns: SYS-003 ist das wichtigste Requirement. Viele andere hängen davon ab."
 
-> "Stufe 6: Prediction - 'SYS-003 hat 73% Wahrscheinlichkeit für Änderung'"
+> "Betweenness zeigt Bottlenecks: SW-002 liegt auf vielen Pfaden. Ändert sich das, hat es Dominoeffekte."
 
-> "Stufe 7: Lernende Systeme - 'Diese Formulierung führt oft zu Rückfragen'"
+---
 
-> "70-80% des Business Value kommt aus Struktur und Regeln - NICHT aus KI. KI ist der Turbo, nicht das Fundament."
+#### Claude-Befehl 2 (Prediction)
+```
+Welche Traceability-Links fehlen vermutlich? Nutze predict_missing_links.
+```
+
+#### Erwartetes Ergebnis
+```
+VORHERGESAGTE FEHLENDE LINKS:
+
+1. SW-003 → TC-??? (Konfidenz: 87%)
+   → Warnblinker Override hat keinen Test!
+
+2. SYS-004 → SW-??? (Konfidenz: 72%)
+   → Bremslicht Intensität nicht abgeleitet
+```
+
+#### Talking Points
+
+> "Das System SAGT VORAUS, welche Links fehlen. SW-003 ohne Test - hatten wir vorhin manuell gefunden. Hier automatisch."
+
+---
+
+#### Claude-Befehl 3 (Similarity)
+```
+Finde ähnliche Requirements zu SYS-003. Nutze find_similar_requirements.
+```
+
+#### Erwartetes Ergebnis
+```
+ÄHNLICHE REQUIREMENTS zu SYS-003:
+
+1. SYS-001 "Blinker <100ms" - Similarity: 0.67
+   → Gleiche Struktur: Timing-Requirement mit Test
+
+2. SYS-007 "Warnblinker ohne Zündung" - Similarity: 0.54
+   → Ähnliche Abhängigkeitsmuster
+```
+
+#### Talking Points
+
+> "Jaccard Similarity findet strukturell ähnliche Requirements. Nützlich für: 'Wenn SYS-003 einen Bug hatte, prüfe auch SYS-001'."
+
+---
+
+### Stufe 7: Lernendes System (22:00 - 27:00)
+
+**🧠 MODUS: Knowledge Graph + Learning (MCP-Tools nutzen)**
+
+> **An Publikum:** "Jetzt der letzte Schritt: Das System lernt aus Feedback."
+
+#### Claude-Befehl 1 (Feedback speichern)
+```
+Speichere Feedback: SYS-003 hat eine vage Zeitangabe "<50ms" - besser wäre "30-50ms".
+Nutze record_feedback mit targetId "SYS-003".
+```
+
+#### Erwartetes Ergebnis
+```
+FEEDBACK GESPEICHERT:
+
+Target: SYS-003 "Bremslicht <50ms"
+Issue: Vage Zeitangabe "<50ms" - besser wäre "30-50ms"
+Typ: review
+
+→ Learning Event erstellt
+→ Pattern-Erkennung getriggert
+```
+
+---
+
+#### Claude-Befehl 2 (Pattern Detection - WOW-Moment)
+```
+Erkenne Anti-Patterns in den Requirements. Nutze detect_patterns.
+```
+
+#### Erwartetes Ergebnis
+```
+ERKANNTE ANTI-PATTERNS:
+
+1. VAGE ZEITANGABE (3 Treffer)
+   - SYS-003: "<50ms" → Range angeben
+   - SYS-001: "<100ms" → Range angeben
+   - EXT-003: ">100ms" → Obergrenze fehlt
+
+2. FEHLENDE EINHEIT (1 Treffer)
+   - SYS-004: "80-300cd" → cd ist korrekt ✓
+
+3. UNSPEZIFISCHE BEDINGUNG (1 Treffer)
+   - STK-004: "bei einer Panne" → Was ist "Panne"?
+```
+
+#### Talking Points
+
+> "Das System hat GELERNT: Vage Zeitangaben sind ein Problem. Es findet jetzt ALLE ähnlichen Fälle automatisch."
+
+> "Das ist der Unterschied zu statischen Regeln: Das System wird besser, je mehr Feedback es bekommt."
+
+---
+
+#### Claude-Befehl 3 (Learning Timeline)
+```
+Was hat das System heute gelernt? Nutze learning_timeline.
+```
+
+#### Erwartetes Ergebnis
+```
+LEARNING TIMELINE:
+
+[27.01.2025 14:32] FEEDBACK_RECEIVED
+  → SYS-003: Vage Zeitangabe erkannt
+
+[27.01.2025 14:32] PATTERN_DETECTED
+  → "Vage Zeitangabe" Pattern zu Knowledge Base hinzugefügt
+
+[27.01.2025 14:33] PATTERN_APPLIED
+  → 3 weitere Requirements mit gleichem Pattern gefunden
+```
+
+#### Talking Points
+
+> "Das System dokumentiert, WAS es WANN gelernt hat. Vollständige Nachvollziehbarkeit."
+
+---
+
+#### Aktion: Dashboard zeigen
+
+Dashboard auf http://localhost:5175 öffnen und Tabs durchklicken:
+
+1. **Knowledge Graph Tab:** Nodes mit Centrality-Größen
+2. **Centrality Metrics Tab:** PageRank/Betweenness Tabelle
+3. **Detected Patterns Tab:** Anti-Pattern Liste
+4. **Learning Timeline Tab:** Chronologische Events
+
+#### Talking Points
+
+> "Das Dashboard zeigt alles auf einen Blick. Für den Quality Manager: Welche Requirements sind kritisch? Welche Patterns treten auf?"
+
+---
+
+### Zusammenfassung (27:00 - 30:00)
+
+#### Talking Points
+
+> "Sie haben heute gesehen:"
+> - Stufe 1-2: PDFs allein reichen nicht
+> - Stufe 3-5: Knowledge Graph + Regeln = 70-80% des Wertes
+> - Stufe 6: ML identifiziert Kritikalität und fehlende Links
+> - Stufe 7: Das System lernt aus Ihrem Feedback
+
+> "Die Frage ist nicht OB, sondern WANN Sie starten."
 
 ---
 
@@ -307,12 +483,18 @@ Datei `ausblick-folien/stufe-6-7-ausblick.md` zeigen.
 |--------|-------|-------|--------|
 | 2:00 | PDF | 📄 Nur PDFs | `Durchsuche das Lastenheft nach Anforderungen zum Thema Bremslicht` |
 | 3:00 | PDF | 📄 Nur PDFs | `Erfüllt unser Außenlichtsystem die A-SPICE Traceability-Anforderungen?` |
-| 5:00 | Graph | 🔗 **MCP nutzen** | `Zeige die Requirement-Hierarchie für das Außenlichtsystem. Nutze query.` |
+| 5:00 | Graph | 🔗 MCP nutzen | `Zeige die Requirement-Hierarchie für das Außenlichtsystem. Nutze query.` |
 | 8:00 | Regel | 🔗 MCP nutzen | `Erstelle Regel: Jedes SoftwareReq muss einen Test haben. Nutze add_rule.` |
 | 9:00 | Valid | 🔗 MCP nutzen | `Prüfe alle aktiven Regeln. Nutze validate.` |
 | 11:00 | Score | 🔗 MCP nutzen | `Berechne den Compliance-Score. Nutze compliance_score.` |
 | 13:00 | Regel | 🔗 MCP nutzen | `Füge Regel hinzu: ASIL-C braucht 2 Tests. Nutze add_rule.` |
 | 15:00 | Impact | 🔗 MCP nutzen | `Was ist betroffen wenn EXT-001 sich ändert? Nutze impact_analysis.` |
+| 17:00 | ML | 🤖 MCP+ML | `Welche Requirements sind am kritischsten? Nutze centrality_analysis.` |
+| 19:00 | Predict | 🤖 MCP+ML | `Welche Traceability-Links fehlen vermutlich? Nutze predict_missing_links.` |
+| 20:00 | Similar | 🤖 MCP+ML | `Finde ähnliche Requirements zu SYS-003. Nutze find_similar_requirements.` |
+| 22:00 | Feedback | 🧠 Learning | `Speichere Feedback zu SYS-003. Nutze record_feedback.` |
+| 24:00 | Pattern | 🧠 Learning | `Erkenne Anti-Patterns. Nutze detect_patterns.` |
+| 26:00 | Timeline | 🧠 Learning | `Was hat das System gelernt? Nutze learning_timeline.` |
 
 ---
 
@@ -324,6 +506,9 @@ Datei `ausblick-folien/stufe-6-7-ausblick.md` zeigen.
 | 9:30 | SW-003 ohne Test gefunden | "Das wäre ein Audit-Finding!" |
 | 14:00 | Score fällt von 85% auf 65% | "So sieht Realität aus" |
 | 16:00 | EXT-001 Impact-Kette | "Wusste das Team davon?" - Stille |
+| 18:00 | PageRank zeigt SYS-003 als kritischstes Req | "Google-Algorithmus für Requirements!" |
+| 19:30 | System sagt SW-003 fehlenden Test voraus | "Das hatten wir manuell gefunden - jetzt automatisch" |
+| 25:00 | Pattern Detection findet 3 vage Zeitangaben | "Aus EINEM Feedback lernt es ALLE Fälle" |
 
 ---
 
@@ -398,5 +583,6 @@ docker exec -i req-traceability-neo4j cypher-shell -u neo4j -p demo-password < s
 ---
 
 **Erstellt:** 2025-01-14
+**Aktualisiert:** 2025-01-29
 **Autor:** andreas@siglochconsulting.de
-**Version:** 2.1 - MCP kann nicht deaktiviert werden (nur nicht nutzen)
+**Version:** 3.0 - Stufe 6-7 Live-Demo mit Dashboard (CR-009)
