@@ -88,18 +88,20 @@ export function GraphView() {
   // Convert nodes to vis-network format (use hex colors - CSS vars don't work on canvas)
   const convertNodes = useCallback(
     (nodes: GraphNode[]): VisNode[] => {
-      return nodes.map((node) => ({
-        id: node.id,
-        label: node.id, // Use ID as label for visibility
-        color: highlightedNodes.has(node.id)
-          ? '#f59e0b' // warning color
-          : NODE_COLORS[node.type],
-        shape: NODE_SHAPES[node.type],
-        size: 25 + (node.centrality || 0) * 30, // Use centrality, min size 25
-        font: { color: '#f8fafc' }, // hex color for canvas
-        borderWidth: selectedNodeId === node.id ? 3 : 2,
-        borderWidthSelected: 4,
-      }))
+      return nodes.map((node) => {
+        const isHighlighted = highlightedNodes.has(node.id)
+        const isSelected = selectedNodeId === node.id
+        return {
+          id: node.id,
+          label: node.id,
+          color: isHighlighted ? '#fbbf24' : NODE_COLORS[node.type], // Brighter yellow when highlighted
+          shape: NODE_SHAPES[node.type],
+          size: 25 + (node.centrality || 0) * 30,
+          font: { color: '#ffffff' },
+          borderWidth: isHighlighted ? 4 : isSelected ? 3 : 2, // Thicker border when highlighted
+          borderWidthSelected: 5,
+        }
+      })
     },
     [highlightedNodes, selectedNodeId]
   )
@@ -123,17 +125,15 @@ export function GraphView() {
       nodes: {
         font: {
           size: 14,
-          color: '#f8fafc',
+          color: '#ffffff', // Plain white, no stroke
           face: 'Inter, system-ui, sans-serif',
-          strokeWidth: 3,
-          strokeColor: '#0f172a',
         },
         borderWidth: 2,
-        borderWidthSelected: 4,
+        borderWidthSelected: 5,
         shadow: {
           enabled: true,
-          color: 'rgba(0,0,0,0.5)',
-          size: 8,
+          color: 'rgba(0,0,0,0.4)',
+          size: 6,
           x: 2,
           y: 2,
         },
@@ -144,13 +144,19 @@ export function GraphView() {
           type: 'continuous',
           roundness: 0.5,
         },
+        font: {
+          size: 9, // Smaller edge labels
+          color: '#94a3b8',
+          face: 'Inter, system-ui, sans-serif',
+          align: 'middle',
+        },
         color: {
           color: '#64748b',
-          highlight: '#94a3b8',
+          highlight: '#f8fafc',
           hover: '#94a3b8',
           inherit: false,
         },
-        width: 2,
+        width: 1.5,
       },
       physics: {
         enabled: true,
@@ -244,13 +250,15 @@ export function GraphView() {
   useEffect(() => {
     if (!nodesDataSetRef.current) return
 
-    const updates = filteredNodes.map((node) => ({
-      id: node.id,
-      color: highlightedNodes.has(node.id)
-        ? '#f59e0b' // warning color hex
-        : NODE_COLORS[node.type],
-      borderWidth: selectedNodeId === node.id ? 3 : 2,
-    }))
+    const updates = filteredNodes.map((node) => {
+      const isHighlighted = highlightedNodes.has(node.id)
+      const isSelected = selectedNodeId === node.id
+      return {
+        id: node.id,
+        color: isHighlighted ? '#fbbf24' : NODE_COLORS[node.type],
+        borderWidth: isHighlighted ? 4 : isSelected ? 3 : 2,
+      }
+    })
 
     nodesDataSetRef.current.update(updates)
   }, [highlightedNodes, selectedNodeId, filteredNodes])
