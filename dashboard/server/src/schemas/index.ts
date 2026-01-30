@@ -44,12 +44,15 @@ export type GraphResponse = z.infer<typeof GraphResponseSchema>;
 // Rules (Regel) Schemas - separate from graph visualization
 // ============================================================================
 
+// CR-010: Updated Regel schema with wirkung taxonomy
 export const RegelSchema = z.object({
   id: z.string(),
   name: z.string(),
-  typ: z.string(),
-  cypher: z.string(),
-  schwere: z.enum(['fehler', 'warnung']),
+  wirkung: z.enum(['Validierung', 'Scoring', 'Optimierung']).optional(),
+  ebene: z.enum(['Struktur', 'Inhalt', 'Konsistenz', 'Vollstaendigkeit']).optional(),
+  domain: z.enum(['Traceability', 'Safety', 'Quality', 'Architektur']).optional(),
+  cypher: z.string().nullable(),
+  schwere: z.enum(['fehler', 'warnung', 'info']),
   standard: z.string(),
   aktiv: z.boolean(),
   createdAt: z.string().datetime().optional(),
@@ -176,3 +179,144 @@ export const ApiErrorSchema = z.object({
 });
 
 export type ApiError = z.infer<typeof ApiErrorSchema>;
+
+// ============================================================================
+// CR-017: Lernquellen & Pattern-Labels Alignment (aimprove ADR-001 Pattern)
+// ============================================================================
+
+// Lernquellen: Woher kommt die Information?
+export const LernquelleSchema = z.enum([
+  'manuell',   // ✏️ User erstellt direkt
+  'feedback',  // 👍 Aus User-Feedback abgeleitet
+  'pattern',   // 🔄 System erkennt Muster (>N gleiche Feedbacks)
+  'chat',      // 💬 Aus Chat-Verlauf extrahiert
+  'import',    // 📥 Externe Quelle (Standard, PDF)
+  'similar',   // 🔗 Ähnlichkeitsanalyse (Embedding-basiert)
+]);
+export type Lernquelle = z.infer<typeof LernquelleSchema>;
+
+// Lernaktionen: Was ist passiert?
+export const LernaktionSchema = z.enum([
+  'created',      // ➕ Neu erstellt
+  'confirmed',    // ✅ Pattern bestätigt
+  'derived',      // 🎯 Regel abgeleitet
+  'updated',      // 🔄 Aktualisiert
+  'consolidated', // 🔀 Zusammengeführt
+  'rejected',     // ❌ Abgelehnt
+]);
+export type Lernaktion = z.infer<typeof LernaktionSchema>;
+
+// Erkennungsmethode: Wie wurde erkannt?
+export const ErkennungsmethodeSchema = z.enum([
+  'lexical',   // Regel-basiert (Regex, Keywords)
+  'semantic',  // Embedding-basiert
+  'temporal',  // Sequenz-basiert
+  'composite', // Kombiniert
+]);
+export type Erkennungsmethode = z.infer<typeof ErkennungsmethodeSchema>;
+
+// Memory Event with CR-017 dimensions
+export const MemoryEventSchema = z.object({
+  id: z.string(),
+  aktion: LernaktionSchema,
+  quelle: LernquelleSchema,
+  methode: ErkennungsmethodeSchema.optional(),
+  beschreibung: z.string(),
+  timestamp: z.string().datetime(),
+  confidence: z.number().min(0).max(1).optional(),
+  relatedNodes: z.array(z.string()).optional(),
+  chatPreview: z.object({
+    messageCount: z.number(),
+    excerpt: z.string(),
+  }).optional(),
+  derivedRule: z.object({
+    id: z.string(),
+    name: z.string(),
+  }).optional(),
+});
+export type MemoryEvent = z.infer<typeof MemoryEventSchema>;
+
+// ============================================================================
+// CR-010: Quality Schemas (Validation, Scoring, Optimization)
+// ============================================================================
+
+export const SchwereSchema = z.enum(['fehler', 'warnung', 'info']);
+export const WirkungSchema = z.enum(['Validierung', 'Scoring', 'Optimierung']);
+export const EbeneSchema = z.enum(['Struktur', 'Inhalt', 'Konsistenz', 'Vollstaendigkeit']);
+export const DomainSchema = z.enum(['Traceability', 'Safety', 'Quality', 'Architektur']);
+export const RichtungSchema = z.enum(['minimieren', 'maximieren']);
+export const OperatorSchema = z.enum(['SPLIT', 'MERGE', 'MOVE', 'CREATE']);
+
+export const ValidationItemSchema = z.object({
+  ruleId: z.string(),
+  ruleName: z.string(),
+  severity: SchwereSchema,
+  domain: DomainSchema,
+  standard: z.string(),
+  affectedElements: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+  })),
+});
+
+export const ValidationResultSchema = z.object({
+  violations: z.array(ValidationItemSchema),
+  errorCount: z.number(),
+  warningCount: z.number(),
+  infoCount: z.number(),
+  timestamp: z.string(),
+});
+
+export const ScoringItemSchema = z.object({
+  ruleId: z.string(),
+  ruleName: z.string(),
+  beschreibung: z.string(),
+  score: z.number(),
+  wert: z.number(),
+  von: z.number(),
+  einheit: z.string(),
+  schwellwert: z.number(),
+  richtung: RichtungSchema,
+  status: z.enum(['ok', 'warnung', 'kritisch']),
+  domain: DomainSchema,
+  standard: z.string(),
+});
+
+export const ScoringResultSchema = z.object({
+  items: z.array(ScoringItemSchema),
+  averageScore: z.number(),
+  timestamp: z.string(),
+});
+
+export const OptimizationSuggestionSchema = z.object({
+  ruleId: z.string(),
+  ruleName: z.string(),
+  beschreibung: z.string(),
+  operator: OperatorSchema,
+  kandidat: z.string(),
+  von: z.string(),
+  nach: z.string(),
+  grund: z.string(),
+  delta: z.number().nullable(),
+  deltaPercent: z.number().nullable(),
+});
+
+export const OptimizationResultSchema = z.object({
+  suggestions: z.array(OptimizationSuggestionSchema),
+  totalSuggestions: z.number(),
+  timestamp: z.string(),
+});
+
+export const QualityResponseSchema = z.object({
+  validation: ValidationResultSchema,
+  scoring: ScoringResultSchema,
+  optimization: OptimizationResultSchema,
+});
+
+export type ValidationItem = z.infer<typeof ValidationItemSchema>;
+export type ValidationResult = z.infer<typeof ValidationResultSchema>;
+export type ScoringItem = z.infer<typeof ScoringItemSchema>;
+export type ScoringResult = z.infer<typeof ScoringResultSchema>;
+export type OptimizationSuggestion = z.infer<typeof OptimizationSuggestionSchema>;
+export type OptimizationResult = z.infer<typeof OptimizationResultSchema>;
+export type QualityResponse = z.infer<typeof QualityResponseSchema>;

@@ -7,22 +7,77 @@ import { useEffect, useRef } from 'react'
 import { useDashboardStore } from '../stores/dashboardStore'
 import type { MemoryEvent } from '../schemas'
 
-const EVENT_COLORS: Record<MemoryEvent['eventType'], string> = {
+// CR-017: Lernquellen-Farben (woher kommt die Information?)
+const QUELLE_COLORS: Record<string, string> = {
+  manuell: 'var(--color-text-muted)',  // ✏️ Grau
+  feedback: '#e67e22',                  // 👍 Orange
+  pattern: '#9b59b6',                   // 🔄 Lila
+  chat: '#27ae60',                      // 💬 Grün
+  import: '#f39c12',                    // 📥 Orange
+  similar: '#00bcd4',                   // 🔗 Cyan
+}
+
+// CR-017: Lernaktionen-Farben (was ist passiert?)
+const AKTION_COLORS: Record<string, string> = {
+  created: 'var(--color-success)',      // ➕ Grün
+  confirmed: '#27ae60',                 // ✅ Grün
+  derived: '#3498db',                   // 🎯 Blau
+  updated: 'var(--color-warning)',      // 🔄 Gelb
+  consolidated: 'var(--color-secondary)', // 🔀 Grau
+  rejected: 'var(--color-error)',       // ❌ Rot
+}
+
+// CR-017: Icons für Lernquellen
+const QUELLE_ICONS: Record<string, string> = {
+  manuell: '✏️',
+  feedback: '👍',
+  pattern: '🔄',
+  chat: '💬',
+  import: '📥',
+  similar: '🔗',
+}
+
+// CR-017: Icons für Lernaktionen
+const AKTION_ICONS: Record<string, string> = {
+  created: '➕',
+  confirmed: '✅',
+  derived: '🎯',
+  updated: '🔄',
+  consolidated: '🔀',
+  rejected: '❌',
+}
+
+// CR-017: Deutsche Labels für Lernquellen
+const QUELLE_LABELS: Record<string, string> = {
+  manuell: 'Manuell',
+  feedback: 'Feedback',
+  pattern: 'Pattern',
+  chat: 'Chat',
+  import: 'Import',
+  similar: 'Ähnlichkeit',
+}
+
+// CR-017: Deutsche Labels für Lernaktionen
+const AKTION_LABELS: Record<string, string> = {
+  created: 'Erstellt',
+  confirmed: 'Bestätigt',
+  derived: 'Abgeleitet',
+  updated: 'Aktualisiert',
+  consolidated: 'Zusammengeführt',
+  rejected: 'Abgelehnt',
+}
+
+// Legacy mapping für eventType (backwards compatibility)
+const LEGACY_EVENT_COLORS: Record<string, string> = {
   learn: 'var(--color-success)',
   recall: 'var(--color-info)',
   consolidate: 'var(--color-secondary)',
   forget: 'var(--color-error)',
   connect: 'var(--color-primary)',
   strengthen: 'var(--color-warning)',
-}
-
-const EVENT_ICONS: Record<MemoryEvent['eventType'], string> = {
-  learn: '+',
-  recall: '~',
-  consolidate: '*',
-  forget: '-',
-  connect: '#',
-  strengthen: '^',
+  chat: '#27ae60',
+  feedback: '#e67e22',
+  pattern: '#9b59b6',
 }
 
 function formatTimestamp(isoString: string): string {
@@ -50,8 +105,32 @@ interface TimelineEventProps {
   isNew: boolean
 }
 
+// CR-017: Helper to get color/icon/label from new or legacy fields
+function getEventDisplay(event: MemoryEvent) {
+  // Prefer new CR-017 fields, fall back to legacy eventType
+  if (event.quelle && event.aktion) {
+    return {
+      color: QUELLE_COLORS[event.quelle] || AKTION_COLORS[event.aktion] || 'var(--color-text-muted)',
+      icon: QUELLE_ICONS[event.quelle] || AKTION_ICONS[event.aktion] || '•',
+      label: `${AKTION_LABELS[event.aktion] || event.aktion} (${QUELLE_LABELS[event.quelle] || event.quelle})`,
+      quelle: event.quelle,
+      aktion: event.aktion,
+    }
+  }
+  // Legacy eventType fallback
+  const eventType = event.eventType || 'learn'
+  return {
+    color: LEGACY_EVENT_COLORS[eventType] || 'var(--color-text-muted)',
+    icon: QUELLE_ICONS[eventType] || AKTION_ICONS[eventType] || '•',
+    label: QUELLE_LABELS[eventType] || AKTION_LABELS[eventType] || eventType,
+    quelle: eventType,
+    aktion: eventType,
+  }
+}
+
 function TimelineEvent({ event, isNew }: TimelineEventProps) {
   const eventRef = useRef<HTMLDivElement>(null)
+  const display = getEventDisplay(event)
 
   useEffect(() => {
     if (isNew && eventRef.current) {
@@ -74,12 +153,12 @@ function TimelineEvent({ event, isNew }: TimelineEventProps) {
       <div
         className="relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold"
         style={{
-          backgroundColor: EVENT_COLORS[event.eventType],
+          backgroundColor: display.color,
           color: 'var(--color-background)',
         }}
-        data-testid={`event-icon-${event.eventType}`}
+        data-testid={`event-icon-${display.quelle}`}
       >
-        {EVENT_ICONS[event.eventType]}
+        {display.icon}
       </div>
 
       {/* Event content */}
@@ -87,10 +166,10 @@ function TimelineEvent({ event, isNew }: TimelineEventProps) {
         <div className="mb-1 flex items-center justify-between">
           <span
             className="text-xs font-semibold uppercase tracking-wide"
-            style={{ color: EVENT_COLORS[event.eventType] }}
+            style={{ color: display.color }}
             data-testid="event-type"
           >
-            {event.eventType}
+            {display.label}
           </span>
           <span
             className="text-xs text-[var(--color-text-muted)]"
@@ -105,8 +184,37 @@ function TimelineEvent({ event, isNew }: TimelineEventProps) {
           className="text-sm text-[var(--color-text-secondary)]"
           data-testid="event-description"
         >
-          {event.description}
+          {event.beschreibung || event.description}
         </p>
+
+        {/* CR-016: Chat preview section */}
+        {event.chatPreview && (
+          <div
+            className="mt-2 rounded border-l-2 bg-[var(--color-surface)] p-2"
+            style={{ borderColor: QUELLE_COLORS.chat }}
+            data-testid="chat-preview"
+          >
+            <div className="flex items-center gap-2 text-xs text-[var(--color-text-muted)]">
+              <span>{event.chatPreview.messageCount} Nachrichten</span>
+            </div>
+            <p className="mt-1 text-xs italic text-[var(--color-text-secondary)]">
+              "{event.chatPreview.excerpt}"
+            </p>
+          </div>
+        )}
+
+        {/* CR-016: Derived rule link */}
+        {event.derivedRule && (
+          <div
+            className="mt-2 inline-flex items-center gap-1 rounded bg-[var(--color-success)]/10 px-2 py-1"
+            data-testid="derived-rule"
+          >
+            <span className="text-xs text-[var(--color-success)]">→</span>
+            <span className="text-xs font-medium text-[var(--color-success)]">
+              {event.derivedRule.id}: {event.derivedRule.name}
+            </span>
+          </div>
+        )}
 
         {event.relatedNodes && event.relatedNodes.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1" data-testid="related-nodes">
@@ -160,23 +268,23 @@ export function MemoryTimeline() {
         </div>
       </div>
 
-      {/* Event type legend */}
+      {/* CR-017: Lernquellen-Legende */}
       <div
         className="flex flex-wrap gap-3 border-b border-[var(--color-border)] px-4 py-2"
         data-testid="timeline-legend"
       >
-        {Object.entries(EVENT_COLORS).map(([type, color]) => (
+        {Object.entries(QUELLE_COLORS).map(([quelle, color]) => (
           <div
-            key={type}
+            key={quelle}
             className="flex items-center gap-1"
-            data-testid={`legend-${type}`}
+            data-testid={`legend-${quelle}`}
           >
             <span
               className="h-2 w-2 rounded-full"
               style={{ backgroundColor: color }}
             />
-            <span className="text-xs capitalize text-[var(--color-text-muted)]">
-              {type}
+            <span className="text-xs text-[var(--color-text-muted)]">
+              {QUELLE_ICONS[quelle]} {QUELLE_LABELS[quelle] || quelle}
             </span>
           </div>
         ))}
