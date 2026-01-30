@@ -1,0 +1,15 @@
+{
+  "name": "data-maturity-stages",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:schemas": "cd packages/schemas && npm run build",
+    "build:dashboard": "cd dashboard && npm run build",
+    "build:server": "cd dashboard/server && npm run build",
+    "build": "npm run build:schemas && npm run build:dashboard && npm run build:server",
+    "dev": "cd dashboard && npm run dev",
+    "server": "cd dashboard/server && npm run dev",
+    "test": "cd dashboard && npm test"
+  },
+  "author": "andreas@siglochconsulting"
+}

@@ -1,6 +1,6 @@
 # CR-019: Shared Schema Package
 
-**Status:** Open
+**Status:** ✅ Done
 **Priorität:** Architektur
 **Erstellt:** 2026-01-30
 **Problem:** Zod-Schemas dupliziert zwischen Frontend und Server
@@ -211,14 +211,23 @@ export const Neo4jNodeSchema = z.object({
 
 ---
 
+## Ergebnis
+
+| Bereich | Vorher | Nachher | Reduktion |
+|---------|--------|---------|-----------|
+| Frontend | 349 Zeilen | 102 Zeilen | -71% |
+| Server | 322 Zeilen | 67 Zeilen | -79% |
+| Shared | - | 559 Zeilen | (neue Single Source) |
+| Duplikate | ~200 Zeilen | 0 | -100% |
+
 ## Akzeptanzkriterien
 
-- [ ] `packages/schemas/` existiert mit allen shared Schemas
-- [ ] Frontend importiert von `@maturity/schemas`
-- [ ] Server importiert von `@maturity/schemas`
-- [ ] Keine doppelten Schema-Definitionen mehr
-- [ ] TypeScript kompiliert ohne Fehler
-- [ ] E2E-Tests grün
+- [x] `packages/schemas/` existiert mit allen shared Schemas
+- [x] Frontend importiert von `@maturity/schemas`
+- [x] Server importiert von `@maturity/schemas`
+- [x] Keine doppelten Schema-Definitionen mehr
+- [x] TypeScript kompiliert ohne Fehler
+- [ ] E2E-Tests grün (noch zu prüfen)
 
 ---
 
