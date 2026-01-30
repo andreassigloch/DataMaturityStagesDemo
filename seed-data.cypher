@@ -15,7 +15,8 @@ CREATE (stk1:StakeholderReq {
   titel: 'Abbiegeabsicht signalisieren',
   beschreibung: 'Der Fahrer muss seine Abbiegeabsicht den anderen Verkehrsteilnehmern signalisieren koennen.',
   prioritaet: 'Muss',
-  status: 'approved'
+  status: 'approved',
+  asil: 'B'
 })
 
 CREATE (stk2:StakeholderReq {
@@ -23,7 +24,8 @@ CREATE (stk2:StakeholderReq {
   titel: 'Bremsvorgang erkennbar',
   beschreibung: 'Nachfolgende Fahrzeuge muessen einen Bremsvorgang des vorausfahrenden Fahrzeugs erkennen koennen.',
   prioritaet: 'Muss',
-  status: 'approved'
+  status: 'approved',
+  asil: 'D'
 })
 
 CREATE (stk3:StakeholderReq {
@@ -31,7 +33,8 @@ CREATE (stk3:StakeholderReq {
   titel: 'Fahrbahn ausleuchten',
   beschreibung: 'Das Fahrzeug muss bei Dunkelheit die Fahrbahn ausleuchten koennen.',
   prioritaet: 'Muss',
-  status: 'approved'
+  status: 'approved',
+  asil: 'B'
 })
 
 CREATE (stk4:StakeholderReq {
@@ -39,7 +42,8 @@ CREATE (stk4:StakeholderReq {
   titel: 'Warnblinker bei Panne',
   beschreibung: 'Der Fahrer muss den Warnblinker bei einer Panne aktivieren koennen.',
   prioritaet: 'Muss',
-  status: 'approved'
+  status: 'approved',
+  asil: 'C'
 });
 
 // =====================================================
@@ -117,28 +121,32 @@ CREATE (sw1:SoftwareReq {
   id: 'SW-001',
   titel: 'Blinkertimer 333ms',
   beschreibung: 'Timer fuer Blinker: 333ms ON, 333ms OFF fuer 1.5Hz.',
-  status: 'implemented'
+  status: 'implemented',
+  asil: 'B'
 })
 
 CREATE (sw2:SoftwareReq {
   id: 'SW-002',
   titel: 'Bremslicht-Schwellwert konfigurierbar',
   beschreibung: 'Bremslicht-Schwellwert konfigurierbar (5-15N).',
-  status: 'implemented'
+  status: 'implemented',
+  asil: 'D'
 })
 
 CREATE (sw3:SoftwareReq {
   id: 'SW-003',
   titel: 'Warnblinker Override',
   beschreibung: 'Warnblinker ueberschreibt Einzelblinker-Betrieb.',
-  status: 'implemented'
+  status: 'implemented',
+  asil: 'B'
 })
 
 CREATE (sw4:SoftwareReq {
   id: 'SW-004',
   titel: 'Batterie-Watchdog',
   beschreibung: 'Batterie-Watchdog fuer Warnblinker-Betrieb ohne Zuendung.',
-  status: 'implemented'
+  status: 'implemented',
+  asil: 'C'
 });
 
 // =====================================================
@@ -194,28 +202,32 @@ CREATE (k1:Komponente {
   id: 'K-001',
   name: 'LightController ECU',
   typ: 'Hardware',
-  beschreibung: 'Zentrale Steuereinheit fuer Aussenbeleuchtung'
+  beschreibung: 'Zentrale Steuereinheit fuer Aussenbeleuchtung',
+  asil: 'D'
 })
 
 CREATE (k2:Komponente {
   id: 'K-002',
   name: 'BlinkerModule',
   typ: 'Software',
-  beschreibung: 'Software-Modul fuer Blinkersteuerung'
+  beschreibung: 'Software-Modul fuer Blinkersteuerung',
+  asil: 'B'
 })
 
 CREATE (k3:Komponente {
   id: 'K-003',
   name: 'BrakeLightModule',
   typ: 'Software',
-  beschreibung: 'Software-Modul fuer Bremslichtsteuerung'
+  beschreibung: 'Software-Modul fuer Bremslichtsteuerung',
+  asil: 'D'
 })
 
 CREATE (k4:Komponente {
   id: 'K-004',
   name: 'HazardLightModule',
   typ: 'Software',
-  beschreibung: 'Software-Modul fuer Warnblinkanlage'
+  beschreibung: 'Software-Modul fuer Warnblinkanlage',
+  asil: 'C'
 });
 
 // =====================================================
@@ -230,7 +242,8 @@ CREATE (ext1:InputSpec {
   quelle: 'Fahrwerk-Team',
   version: '2.3',
   resolution: '0.1N',
-  cycleTime: '10ms'
+  cycleTime: '10ms',
+  asil: 'D'
 })
 
 CREATE (ext2:InputSpec {
@@ -239,7 +252,8 @@ CREATE (ext2:InputSpec {
   beschreibung: 'Maximale CAN-Bus Zykluszeit der Plattform.',
   quelle: 'Plattform-Team',
   version: '1.1',
-  maxCycleTime: '10ms'
+  maxCycleTime: '10ms',
+  asil: 'B'
 })
 
 CREATE (ext3:InputSpec {
@@ -249,7 +263,8 @@ CREATE (ext3:InputSpec {
   quelle: 'Safety-Team',
   version: '4.0',
   timeout: '100ms',
-  action: 'Fail-Safe'
+  action: 'Fail-Safe',
+  asil: 'C'
 });
 
 // =====================================================
@@ -357,60 +372,193 @@ CREATE (sw2)-[:DEPENDS_ON {
 
 // =====================================================
 // VALIDIERUNGSREGELN (Regel-Knoten)
-// Abgeleitet aus A-SPICE und ISO 26262
+// CR-010: Funktions-basiertes Schema
+// Taxonomie: ebene (WAS) + wirkung (OUTPUT) + domain (WO)
 // =====================================================
 
-CREATE (reg1:Regel {
-  id: 'REG-001',
+// -----------------------------------------------------
+// VALIDIERUNG (wirkung: 'Validierung') → Verbesserungsvorschlaege
+// -----------------------------------------------------
+
+CREATE (val1:Regel {
+  id: 'VAL-001',
   name: 'Traceability-Vollstaendigkeit',
-  typ: 'Traceability',
-  cypher: 'MATCH (sw:SoftwareReq) WHERE NOT (sw)-[:TRACED_TO]->(:SystemReq) RETURN sw.id AS violation, sw.titel AS beschreibung',
+  beschreibung: 'Jedes Software-Requirement muss zu einem System-Requirement zurueckverfolgbar sein',
+  ebene: 'Vollstaendigkeit',
+  wirkung: 'Validierung',
+  cypher: 'MATCH (sw:SoftwareReq) WHERE NOT (:SystemReq)-[:TRACED_TO]->(sw) RETURN sw.id AS id, sw.titel AS name, "SoftwareReq" AS typ',
   schwere: 'fehler',
+  domain: 'Traceability',
   standard: 'A-SPICE',
+  quelle: 'manuell',
+  confidence: 1.0,
+  anwendungen: 0,
+  treffer: 0,
   aktiv: true,
-  createdAt: datetime()
+  erstelltAm: datetime()
 })
 
-CREATE (reg2:Regel {
-  id: 'REG-002',
+CREATE (val2:Regel {
+  id: 'VAL-002',
   name: 'Test-Coverage',
-  typ: 'Coverage',
-  cypher: 'MATCH (sw:SoftwareReq) WHERE NOT (sw)-[:VERIFIED_BY]->(:TestCase) RETURN sw.id AS violation, sw.titel AS beschreibung',
+  beschreibung: 'Jedes Software-Requirement braucht mindestens einen zugeordneten TestCase',
+  ebene: 'Vollstaendigkeit',
+  wirkung: 'Validierung',
+  cypher: 'MATCH (sw:SoftwareReq) WHERE NOT (sw)-[:VERIFIED_BY]->(:TestCase) RETURN sw.id AS id, sw.titel AS name, "SoftwareReq" AS typ',
   schwere: 'fehler',
+  domain: 'Traceability',
   standard: 'A-SPICE',
+  quelle: 'manuell',
+  confidence: 1.0,
+  anwendungen: 0,
+  treffer: 0,
   aktiv: true,
-  createdAt: datetime()
+  erstelltAm: datetime()
 })
 
-CREATE (reg3:Regel {
-  id: 'REG-003',
+CREATE (val3:Regel {
+  id: 'VAL-003',
   name: 'Vage Zeitangaben',
-  typ: 'Quality',
-  cypher: 'MATCH (n) WHERE n.beschreibung =~ \".*schnell.*\" OR n.beschreibung =~ \".*bald.*\" OR n.beschreibung =~ \".*zeitnah.*\" RETURN n.id AS violation, n.beschreibung AS beschreibung',
+  beschreibung: 'Requirements duerfen keine unspezifischen Zeitangaben wie schnell, bald, zeitnah enthalten',
+  ebene: 'Inhalt',
+  wirkung: 'Validierung',
+  cypher: 'MATCH (n) WHERE n.beschreibung =~ ".*schnell.*" OR n.beschreibung =~ ".*bald.*" OR n.beschreibung =~ ".*zeitnah.*" RETURN n.id AS id, n.beschreibung AS name, labels(n)[0] AS typ',
   schwere: 'warnung',
+  domain: 'Quality',
   standard: 'ISO 26262',
+  quelle: 'manuell',
+  confidence: 1.0,
+  anwendungen: 0,
+  treffer: 0,
   aktiv: true,
-  createdAt: datetime()
+  erstelltAm: datetime()
 })
 
-CREATE (reg4:Regel {
-  id: 'REG-004',
+CREATE (val4:Regel {
+  id: 'VAL-004',
   name: 'Externe Abhaengigkeiten dokumentiert',
-  typ: 'Traceability',
-  cypher: 'MATCH (sys:SystemReq) WHERE sys.beschreibung CONTAINS \"CAN\" AND NOT (sys)-[:DEPENDS_ON]->(:InputSpec) RETURN sys.id AS violation, sys.titel AS beschreibung',
+  beschreibung: 'System-Requirements mit CAN-Bezug muessen externe Abhaengigkeiten dokumentieren',
+  ebene: 'Struktur',
+  wirkung: 'Validierung',
+  cypher: 'MATCH (sys:SystemReq) WHERE sys.beschreibung CONTAINS "CAN" AND NOT (sys)-[:DEPENDS_ON]->(:InputSpec) RETURN sys.id AS id, sys.titel AS name, "SystemReq" AS typ',
   schwere: 'warnung',
+  domain: 'Traceability',
   standard: 'A-SPICE',
+  quelle: 'manuell',
+  confidence: 1.0,
+  anwendungen: 0,
+  treffer: 0,
   aktiv: true,
-  createdAt: datetime()
+  erstelltAm: datetime()
 })
 
-CREATE (reg5:Regel {
-  id: 'REG-005',
+CREATE (val5:Regel {
+  id: 'VAL-005',
   name: 'ASIL-Klassifizierung',
-  typ: 'Safety',
-  cypher: 'MATCH (sys:SystemReq) WHERE sys.asil IS NULL AND sys.beschreibung CONTAINS \"Brems\" RETURN sys.id AS violation, sys.titel AS beschreibung',
+  beschreibung: 'Sicherheitsrelevante System-Requirements (Brems*) muessen ASIL-klassifiziert sein',
+  ebene: 'Konsistenz',
+  wirkung: 'Validierung',
+  cypher: 'MATCH (sys:SystemReq) WHERE sys.asil IS NULL AND sys.beschreibung CONTAINS "Brems" RETURN sys.id AS id, sys.titel AS name, "SystemReq" AS typ',
   schwere: 'fehler',
+  domain: 'Safety',
   standard: 'ISO 26262',
+  quelle: 'manuell',
+  confidence: 1.0,
+  anwendungen: 0,
+  treffer: 0,
   aktiv: false,
-  createdAt: datetime()
+  erstelltAm: datetime()
+})
+
+// -----------------------------------------------------
+// SCORING (wirkung: 'Scoring') → Kennzahlen
+// -----------------------------------------------------
+
+CREATE (sco1:Regel {
+  id: 'SCO-001',
+  name: 'Testabdeckung',
+  beschreibung: 'Prozentsatz der Software-Requirements mit zugeordnetem Test',
+  ebene: 'Vollstaendigkeit',
+  wirkung: 'Scoring',
+  cypher: 'MATCH (sw:SoftwareReq) OPTIONAL MATCH (sw)-[:VERIFIED_BY]->(tc:TestCase) WITH count(DISTINCT sw) AS total, count(DISTINCT tc) AS covered RETURN covered AS wert, total AS von, CASE WHEN total = 0 THEN 0.0 ELSE toFloat(covered)/total END AS score, "%" AS einheit',
+  schwellwert: 0.8,
+  richtung: 'maximieren',
+  schwere: 'info',
+  domain: 'Traceability',
+  standard: 'A-SPICE',
+  quelle: 'manuell',
+  confidence: 1.0,
+  anwendungen: 0,
+  treffer: 0,
+  aktiv: true,
+  erstelltAm: datetime()
+})
+
+// CR-012: Korrigierte Berechnung - zählt SoftwareReqs MIT Trace, nicht SystemReqs
+CREATE (sco2:Regel {
+  id: 'SCO-002',
+  name: 'Traceability-Quote',
+  beschreibung: 'Prozentsatz der Software-Requirements mit System-Requirement Verlinkung',
+  ebene: 'Vollstaendigkeit',
+  wirkung: 'Scoring',
+  cypher: 'MATCH (sw:SoftwareReq) WITH sw, exists((:SystemReq)-[:TRACED_TO]->(sw)) AS hasTrace WITH count(sw) AS total, sum(CASE WHEN hasTrace THEN 1 ELSE 0 END) AS traced RETURN traced AS wert, total AS von, CASE WHEN total = 0 THEN 0.0 ELSE toFloat(traced)/total END AS score, "%" AS einheit',
+  schwellwert: 1.0,
+  richtung: 'maximieren',
+  schwere: 'info',
+  domain: 'Traceability',
+  standard: 'A-SPICE',
+  quelle: 'manuell',
+  confidence: 1.0,
+  anwendungen: 0,
+  treffer: 0,
+  aktiv: true,
+  erstelltAm: datetime()
+})
+
+// -----------------------------------------------------
+// OPTIMIERUNG (wirkung: 'Optimierung') → Delta-Vorschlaege
+// -----------------------------------------------------
+
+CREATE (opt1:Regel {
+  id: 'OPT-001',
+  name: 'Cross-References minimieren',
+  beschreibung: 'Module so strukturieren, dass Abhaengigkeiten zwischen Modulen minimiert werden',
+  ebene: 'Struktur',
+  wirkung: 'Optimierung',
+  cypher_measure: 'MATCH (k1:Komponente)-[d:DEPENDS_ON]->(k2:Komponente) WHERE k1 <> k2 RETURN count(d) AS metricValue',
+  cypher: 'MATCH (sw:SoftwareReq)-[:IMPLEMENTED_IN]->(k1:Komponente) MATCH (sw)-[:DEPENDS_ON]->(ext:InputSpec) MATCH (other:SoftwareReq)-[:DEPENDS_ON]->(ext) WHERE other <> sw MATCH (other)-[:IMPLEMENTED_IN]->(k2:Komponente) WHERE k1 <> k2 RETURN sw.id AS kandidat, k1.name AS von, k2.name AS nach, "Verschieben reduziert Cross-Reference" AS grund',
+  schwellwert: 10,
+  richtung: 'minimieren',
+  operator: 'MOVE',
+  schwere: 'info',
+  domain: 'Architektur',
+  standard: 'Intern',
+  quelle: 'manuell',
+  confidence: 1.0,
+  anwendungen: 0,
+  treffer: 0,
+  aktiv: true,
+  erstelltAm: datetime()
+})
+
+CREATE (opt2:Regel {
+  id: 'OPT-002',
+  name: 'Modul-Kohaesion maximieren',
+  beschreibung: 'Software-Requirements im selben Modul sollten gemeinsame externe Abhaengigkeiten haben',
+  ebene: 'Struktur',
+  wirkung: 'Optimierung',
+  cypher_measure: 'MATCH (k:Komponente)<-[:IMPLEMENTED_IN]-(sw:SoftwareReq) WITH k, collect(sw) AS reqs UNWIND reqs AS r1 UNWIND reqs AS r2 WHERE id(r1) < id(r2) OPTIONAL MATCH (r1)-[:DEPENDS_ON]->(ext:InputSpec)<-[:DEPENDS_ON]-(r2) WITH k, count(DISTINCT ext) AS sharedDeps, count(*) AS pairs RETURN avg(CASE WHEN pairs = 0 THEN 0 ELSE toFloat(sharedDeps)/pairs END) AS metricValue',
+  cypher: 'MATCH (sw:SoftwareReq)-[:IMPLEMENTED_IN]->(k:Komponente) WHERE NOT exists((sw)-[:DEPENDS_ON]->(:InputSpec)) RETURN sw.id AS kandidat, k.name AS von, "anderes Modul" AS nach, "Keine gemeinsamen Abhaengigkeiten mit anderen im Modul" AS grund LIMIT 5',
+  schwellwert: 0.5,
+  richtung: 'maximieren',
+  operator: 'MOVE',
+  schwere: 'info',
+  domain: 'Architektur',
+  standard: 'Intern',
+  quelle: 'manuell',
+  confidence: 0.8,
+  anwendungen: 0,
+  treffer: 0,
+  aktiv: true,
+  erstelltAm: datetime()
 });

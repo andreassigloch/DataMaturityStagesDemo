@@ -39,7 +39,11 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
     }
 
     // Schema normalizes MCP format (targetId/issue) to (nodeId/message)
-    const { nodeId, type, severity, message } = parseResult.data;
+    const data = parseResult.data;
+    const nodeId = data.nodeId || data.targetId || '';
+    const type = data.type || 'observation';
+    const severity = data.severity || 'info';
+    const message = data.message || data.issue || '';
 
     // Verify node exists in Neo4j
     const readSession = getReadSession();

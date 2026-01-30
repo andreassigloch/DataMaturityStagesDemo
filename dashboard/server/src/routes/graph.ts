@@ -76,6 +76,7 @@ router.get('/', async (_req: Request, res: Response): Promise<void> => {
       id: record.get('relId') as string,
       from: record.get('sourceId') as string,
       to: record.get('targetId') as string,
+      weight: 1,
       type: record.get('relType') as GraphEdge['type'],
       properties: serializeProperties(record.get('props') as Record<string, unknown> || {}),
     }));

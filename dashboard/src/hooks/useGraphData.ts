@@ -130,3 +130,55 @@ export function usePatterns(apiUrl = '/api/patterns') {
     fetchPatterns,
   }
 }
+
+// CR-010: Hook for fetching quality data (validation, scoring, optimization)
+export function useQualityData(apiUrl = '/api/quality') {
+  const {
+    setValidationResult,
+    setScoringResult,
+    setOptimizationResult,
+    setLoading,
+    setError,
+    validationResult,
+    scoringResult,
+    optimizationResult,
+  } = useDashboardStore()
+
+  const fetchQualityData = useCallback(async () => {
+    setLoading(true)
+
+    try {
+      const response = await fetch(apiUrl)
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      const json = await response.json()
+
+      if (json.validation) {
+        setValidationResult(json.validation)
+      }
+      if (json.scoring) {
+        setScoringResult(json.scoring)
+      }
+      if (json.optimization) {
+        setOptimizationResult(json.optimization)
+      }
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Failed to fetch quality data'
+      console.error('[Quality] Fetch error:', message)
+      setError(message)
+    } finally {
+      setLoading(false)
+    }
+  }, [apiUrl, setValidationResult, setScoringResult, setOptimizationResult, setLoading, setError])
+
+  return {
+    validationResult,
+    scoringResult,
+    optimizationResult,
+    fetchQualityData,
+  }
+}

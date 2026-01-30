@@ -1,5 +1,6 @@
 /**
- * CentralityPanel Component - PageRank/Betweenness Statistics
+ * CentralityPanel Component - Three Importance Metrics (CR-014)
+ * Impact Score | Change Risk | Review Priority
  * @author andreas@siglochconsulting
  */
 
@@ -17,34 +18,13 @@ const TYPE_COLORS: Record<NodeType, string> = {
   Komponente: '#78909c', // Gray-blue (WCAG AA)
 }
 
-interface MetricBarProps {
-  value: number
-  max: number
-  color: string
-  label: string
+// CR-014: Color coding for metric values (0-100)
+function getMetricColor(value: number): string {
+  if (value < 30) return 'var(--color-success)'    // green
+  if (value < 70) return 'var(--color-warning)'    // yellow
+  return 'var(--color-error)'                       // red
 }
 
-function MetricBar({ value, max, color, label }: MetricBarProps) {
-  const percentage = max > 0 ? (value / max) * 100 : 0
-
-  return (
-    <div className="group relative">
-      <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--color-surface-elevated)]">
-        <div
-          className="h-full rounded-full transition-all duration-300"
-          style={{
-            width: `${percentage}%`,
-            backgroundColor: color,
-          }}
-          data-testid={`metric-bar-${label}`}
-        />
-      </div>
-      <span className="absolute -top-6 left-1/2 hidden -translate-x-1/2 rounded bg-[var(--color-surface-elevated)] px-2 py-1 text-xs text-[var(--color-text-primary)] shadow-lg group-hover:block">
-        {value.toFixed(4)}
-      </span>
-    </div>
-  )
-}
 
 interface SortButtonProps {
   field: keyof CentralityMetrics
@@ -91,16 +71,28 @@ function SortButton({
 
 interface NodeRowProps {
   node: CentralityMetrics
-  maxValues: {
-    pageRank: number
-    betweenness: number
-    degree: number
-  }
   onSelect: (nodeId: string) => void
   isSelected: boolean
 }
 
-function NodeRow({ node, maxValues, onSelect, isSelected }: NodeRowProps) {
+// CR-014: Metric badge with color coding
+function MetricBadge({ value, label }: { value: number; label: string }) {
+  return (
+    <span
+      className="inline-flex min-w-[40px] items-center justify-center rounded px-2 py-0.5 text-xs font-medium"
+      style={{
+        backgroundColor: getMetricColor(value),
+        color: value < 70 ? 'var(--color-text-primary)' : 'white',
+      }}
+      data-testid={`metric-${label}`}
+      title={`${label}: ${value}%`}
+    >
+      {value}
+    </span>
+  )
+}
+
+function NodeRow({ node, onSelect, isSelected }: NodeRowProps) {
   return (
     <tr
       onClick={() => onSelect(node.nodeId)}
@@ -109,51 +101,42 @@ function NodeRow({ node, maxValues, onSelect, isSelected }: NodeRowProps) {
       }`}
       data-testid={`centrality-row-${node.nodeId}`}
     >
-      <td className="px-3 py-2">
+      <td className="px-3 py-2" style={{ minWidth: '200px' }}>
         <div className="flex items-center gap-2">
           <span
-            className="h-2 w-2 rounded-full"
+            className="h-2 w-2 shrink-0 rounded-full"
             style={{ backgroundColor: TYPE_COLORS[node.type] }}
           />
           <span
-            className="max-w-[150px] truncate text-sm text-[var(--color-text-primary)]"
+            className="truncate text-sm text-[var(--color-text-primary)]"
             title={node.label}
           >
             {node.label}
           </span>
         </div>
       </td>
-      <td className="px-3 py-2">
-        <span
-          className="inline-block rounded bg-[var(--color-surface-elevated)] px-2 py-0.5 text-xs capitalize text-[var(--color-text-muted)]"
-          data-testid="node-type"
-        >
-          {node.type}
+      <td className="px-1 py-2 text-center">
+        <span className={`inline-block min-w-[28px] rounded px-1.5 py-0.5 text-xs font-medium ${
+          node.asil === 'D' ? 'bg-[var(--color-error)] text-white' :
+          node.asil === 'C' ? 'bg-[var(--color-warning)] text-[var(--color-text-primary)]' :
+          node.asil === 'B' ? 'bg-[var(--color-info)]/30 text-[var(--color-info)]' :
+          node.asil === 'A' ? 'bg-[var(--color-success)]/30 text-[var(--color-success)]' :
+          'bg-[var(--color-surface-elevated)] text-[var(--color-text-muted)]'
+        }`}>
+          {node.asil || 'QM'}
         </span>
       </td>
-      <td className="w-32 px-3 py-2">
-        <MetricBar
-          value={node.pageRank}
-          max={maxValues.pageRank}
-          color="var(--color-primary)"
-          label="pagerank"
-        />
+      <td className="px-1 py-2 text-center">
+        <span className="text-xs text-[var(--color-text-muted)]">{node.degree}</span>
       </td>
-      <td className="w-32 px-3 py-2">
-        <MetricBar
-          value={node.betweenness}
-          max={maxValues.betweenness}
-          color="var(--color-secondary)"
-          label="betweenness"
-        />
+      <td className="px-1 py-2 text-center">
+        <MetricBadge value={node.impactScore} label="impact" />
       </td>
-      <td className="px-3 py-2 text-center">
-        <span
-          className="text-sm font-medium text-[var(--color-text-primary)]"
-          data-testid="degree-value"
-        >
-          {node.degree}
-        </span>
+      <td className="px-1 py-2 text-center">
+        <MetricBadge value={node.changeRisk} label="change-risk" />
+      </td>
+      <td className="px-1 py-2 text-center">
+        <MetricBadge value={node.reviewPriority} label="review-priority" />
       </td>
     </tr>
   )
@@ -184,36 +167,24 @@ export function CentralityPanel() {
     })
   }, [centralityMetrics, sortBy, sortDirection])
 
-  // Calculate max values for bar scaling
-  const maxValues = useMemo(() => {
-    if (sortedMetrics.length === 0) {
-      return { pageRank: 1, betweenness: 1, degree: 1 }
-    }
-    return {
-      pageRank: Math.max(...sortedMetrics.map((m) => m.pageRank)),
-      betweenness: Math.max(...sortedMetrics.map((m) => m.betweenness)),
-      degree: Math.max(...sortedMetrics.map((m) => m.degree)),
-    }
-  }, [sortedMetrics])
-
-  // Calculate statistics
+  // CR-014: Calculate statistics for three metrics
   const stats = useMemo(() => {
     if (sortedMetrics.length === 0) {
-      return { avgPageRank: 0, avgBetweenness: 0, avgDegree: 0 }
+      return { avgImpact: 0, avgChangeRisk: 0, avgReviewPriority: 0 }
     }
     const sum = sortedMetrics.reduce(
       (acc, m) => ({
-        pageRank: acc.pageRank + m.pageRank,
-        betweenness: acc.betweenness + m.betweenness,
-        degree: acc.degree + m.degree,
+        impact: acc.impact + m.impactScore,
+        changeRisk: acc.changeRisk + m.changeRisk,
+        reviewPriority: acc.reviewPriority + m.reviewPriority,
       }),
-      { pageRank: 0, betweenness: 0, degree: 0 }
+      { impact: 0, changeRisk: 0, reviewPriority: 0 }
     )
     const count = sortedMetrics.length
     return {
-      avgPageRank: sum.pageRank / count,
-      avgBetweenness: sum.betweenness / count,
-      avgDegree: sum.degree / count,
+      avgImpact: Math.round(sum.impact / count),
+      avgChangeRisk: Math.round(sum.changeRisk / count),
+      avgReviewPriority: Math.round(sum.reviewPriority / count),
     }
   }, [sortedMetrics])
 
@@ -232,72 +203,75 @@ export function CentralityPanel() {
 
   return (
     <div className="flex h-full flex-col" data-testid="centrality-panel">
-      {/* Header stats */}
+      {/* Header stats (CR-014: drei Wichtungen) */}
       <div
-        className="grid grid-cols-3 gap-4 border-b border-[var(--color-border)] px-4 py-3"
+        className="grid grid-cols-3 gap-3 border-b border-[var(--color-border)] px-4 py-3"
         data-testid="centrality-stats"
       >
         <div className="rounded-lg bg-[var(--color-surface-elevated)] p-3">
           <div className="text-xs text-[var(--color-text-muted)]">
-            Avg PageRank
+            Ø Impact
           </div>
           <div
-            className="text-lg font-semibold text-[var(--color-primary)]"
-            data-testid="avg-pagerank"
+            className="text-lg font-semibold"
+            style={{ color: getMetricColor(stats.avgImpact) }}
+            data-testid="avg-impact"
           >
-            {stats.avgPageRank.toFixed(4)}
+            {stats.avgImpact}%
           </div>
         </div>
         <div className="rounded-lg bg-[var(--color-surface-elevated)] p-3">
           <div className="text-xs text-[var(--color-text-muted)]">
-            Avg Betweenness
+            Ø Change-Risk
           </div>
           <div
-            className="text-lg font-semibold text-[var(--color-secondary)]"
-            data-testid="avg-betweenness"
+            className="text-lg font-semibold"
+            style={{ color: getMetricColor(stats.avgChangeRisk) }}
+            data-testid="avg-change-risk"
           >
-            {stats.avgBetweenness.toFixed(4)}
+            {stats.avgChangeRisk}%
           </div>
         </div>
         <div className="rounded-lg bg-[var(--color-surface-elevated)] p-3">
           <div className="text-xs text-[var(--color-text-muted)]">
-            Avg Degree
+            Ø Review-Prio
           </div>
           <div
-            className="text-lg font-semibold text-[var(--color-info)]"
-            data-testid="avg-degree"
+            className="text-lg font-semibold"
+            style={{ color: getMetricColor(stats.avgReviewPriority) }}
+            data-testid="avg-review-priority"
           >
-            {stats.avgDegree.toFixed(1)}
+            {stats.avgReviewPriority}%
           </div>
         </div>
       </div>
 
-      {/* Sort controls */}
+      {/* Sort controls (CR-014: drei Metriken) */}
       <div
-        className="flex items-center gap-2 border-b border-[var(--color-border)] px-4 py-2"
+        className="flex flex-wrap items-center gap-2 border-b border-[var(--color-border)] px-4 py-2"
         data-testid="sort-controls"
       >
-        <span className="text-xs text-[var(--color-text-muted)]">Sort by:</span>
+        <span className="text-xs text-[var(--color-text-muted)]">Sortieren:</span>
         <SortButton
-          field="pageRank"
-          label="PageRank"
+          field="reviewPriority"
+          label="Review-Prio"
           currentSort={sortBy}
           direction={sortDirection}
-          onClick={() => handleSort('pageRank')}
+          onClick={() => handleSort('reviewPriority')}
         />
         <SortButton
-          field="betweenness"
-          label="Betweenness"
+          field="impactScore"
+          label="Impact"
           currentSort={sortBy}
           direction={sortDirection}
-          onClick={() => handleSort('betweenness')}
+          onClick={() => handleSort('impactScore')}
         />
         <SortButton
-          field="degree"
-          label="Degree"
+          field="changeRisk"
+          label="Change-Risk"
           currentSort={sortBy}
           direction={sortDirection}
-          onClick={() => handleSort('degree')}
+          onClick={() => handleSort('changeRisk')}
         />
         <SortButton
           field="label"
@@ -316,18 +290,19 @@ export function CentralityPanel() {
             data-testid="centrality-empty"
           >
             <p className="text-sm text-[var(--color-text-muted)]">
-              No centrality metrics available. Load graph data first.
+              Keine Daten vorhanden. Bitte Graph-Daten laden.
             </p>
           </div>
         ) : (
           <table className="w-full">
             <thead className="sticky top-0 bg-[var(--color-surface)]">
               <tr className="text-left text-xs text-[var(--color-text-muted)]">
-                <th className="px-3 py-2 font-medium">Node</th>
-                <th className="px-3 py-2 font-medium">Type</th>
-                <th className="px-3 py-2 font-medium">PageRank</th>
-                <th className="px-3 py-2 font-medium">Betweenness</th>
-                <th className="px-3 py-2 text-center font-medium">Degree</th>
+                <th className="px-3 py-2 font-medium" style={{ minWidth: '200px' }}>Element</th>
+                <th className="px-1 py-2 text-center font-medium">ASIL</th>
+                <th className="px-1 py-2 text-center font-medium">Edges</th>
+                <th className="px-1 py-2 text-center font-medium">Impact</th>
+                <th className="px-1 py-2 text-center font-medium">Change</th>
+                <th className="px-1 py-2 text-center font-medium">Review</th>
               </tr>
             </thead>
             <tbody>
@@ -335,7 +310,6 @@ export function CentralityPanel() {
                 <NodeRow
                   key={node.nodeId}
                   node={node}
-                  maxValues={maxValues}
                   onSelect={handleSelectNode}
                   isSelected={selectedNodeId === node.nodeId}
                 />

@@ -87,7 +87,7 @@ export type SSEEvent = z.infer<typeof SSEEventSchema>
 // Validation Helpers
 // =============================================================================
 
-import { GraphData } from '@maturity/schemas'
+import type { GraphData } from '@maturity/schemas'
 
 export function validateGraphData(data: unknown): GraphData {
   return GraphDataSchema.parse(data)

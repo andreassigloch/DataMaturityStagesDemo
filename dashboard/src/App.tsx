@@ -6,8 +6,8 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { useDashboardStore } from './stores/dashboardStore'
 import { useSSE } from './hooks/useSSE'
-import { useGraphData, useCentralityMetrics } from './hooks/useGraphData'
-import { MemoryTimeline, CentralityPanel, PatternList, RulesPanel } from './components'
+import { useGraphData, useCentralityMetrics, useQualityData } from './hooks/useGraphData'
+import { MemoryTimeline, CentralityPanel, QualityPanel, RulesPanel, OptimizationPanel } from './components'
 import type { Tab } from './schemas'
 
 // Lazy load GraphView (vis-network is 500KB+)
@@ -57,8 +57,8 @@ const TABS: { id: Tab; label: string; icon: React.ReactElement }[] = [
     ),
   },
   {
-    id: 'patterns',
-    label: 'Qualitätsprobleme',
+    id: 'quality',
+    label: 'Qualität',
     icon: (
       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -80,6 +80,20 @@ const TABS: { id: Tab; label: string; icon: React.ReactElement }[] = [
           strokeLinejoin="round"
           strokeWidth={2}
           d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+    ),
+  },
+  {
+    id: 'optimization',
+    label: 'Optimierung',
+    icon: (
+      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M13 10V3L4 14h7v7l9-11h-7z"
         />
       </svg>
     ),
@@ -208,10 +222,12 @@ function TabContent({ tab }: { tab: Tab }) {
       return <MemoryTimeline />
     case 'centrality':
       return <CentralityPanel />
-    case 'patterns':
-      return <PatternList />
+    case 'quality':
+      return <QualityPanel />
     case 'rules':
       return <RulesPanel />
+    case 'optimization':
+      return <OptimizationPanel />
     default:
       return null
   }
@@ -233,11 +249,13 @@ export default function App() {
   // Fetch initial data
   const { refetch: refetchGraph } = useGraphData({ autoFetch: true })
   const { fetchCentrality } = useCentralityMetrics()
+  const { fetchQualityData } = useQualityData()
 
-  // Fetch centrality metrics on mount
+  // Fetch centrality and quality data on mount
   useEffect(() => {
     fetchCentrality()
-  }, [fetchCentrality])
+    fetchQualityData()
+  }, [fetchCentrality, fetchQualityData])
 
   return (
     <div

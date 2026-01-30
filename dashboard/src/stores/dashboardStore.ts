@@ -15,7 +15,16 @@ import type {
   Tab,
   FilterState,
   NodeType,
+  ValidationResult,
+  ScoringResult,
+  OptimizationResult,
+  QualityTab,
 } from '../schemas'
+import {
+  MOCK_CENTRALITY_METRICS,
+  MOCK_DETECTED_PATTERNS,
+  MOCK_MEMORY_EVENTS,
+} from '../data/mockData'
 
 interface DashboardState {
   // Graph data
@@ -36,6 +45,12 @@ interface DashboardState {
   // Patterns
   detectedPatterns: DetectedPattern[]
   selectedPatternId: string | null
+
+  // CR-010: Quality data (Validierung, Scoring, Optimierung)
+  validationResult: ValidationResult | null
+  scoringResult: ScoringResult | null
+  optimizationResult: OptimizationResult | null
+  activeQualityTab: QualityTab
 
   // UI state
   activeTab: Tab
@@ -62,6 +77,12 @@ interface DashboardState {
 
   addPattern: (pattern: DetectedPattern) => void
   selectPattern: (patternId: string | null) => void
+
+  // CR-010: Quality actions
+  setValidationResult: (result: ValidationResult | null) => void
+  setScoringResult: (result: ScoringResult | null) => void
+  setOptimizationResult: (result: OptimizationResult | null) => void
+  setActiveQualityTab: (tab: QualityTab) => void
 
   setActiveTab: (tab: Tab) => void
   updateFilters: (filters: Partial<FilterState>) => void
@@ -94,16 +115,23 @@ export const useDashboardStore = create<DashboardState>()(
       selectedNodeId: null,
       highlightedNodes: new Set(),
 
-      memoryEvents: [],
+      // Use mock data for demo (will be replaced by real data when available)
+      memoryEvents: MOCK_MEMORY_EVENTS,
       isTimelinePlaying: false,
       timelineSpeed: 1,
 
-      centralityMetrics: [],
-      sortBy: 'pageRank',
+      centralityMetrics: MOCK_CENTRALITY_METRICS,
+      sortBy: 'reviewPriority',  // CR-014: Default sort by Review-Priority
       sortDirection: 'desc',
 
-      detectedPatterns: [],
+      detectedPatterns: MOCK_DETECTED_PATTERNS,
       selectedPatternId: null,
+
+      // CR-010: Quality data initial state
+      validationResult: null,
+      scoringResult: null,
+      optimizationResult: null,
+      activeQualityTab: 'validierung',
 
       activeTab: 'graph',
       filters: defaultFilters,
@@ -204,6 +232,19 @@ export const useDashboardStore = create<DashboardState>()(
           'selectPattern'
         )
       },
+
+      // CR-010: Quality actions
+      setValidationResult: (result) =>
+        set({ validationResult: result }, false, 'setValidationResult'),
+
+      setScoringResult: (result) =>
+        set({ scoringResult: result }, false, 'setScoringResult'),
+
+      setOptimizationResult: (result) =>
+        set({ optimizationResult: result }, false, 'setOptimizationResult'),
+
+      setActiveQualityTab: (tab) =>
+        set({ activeQualityTab: tab }, false, 'setActiveQualityTab'),
 
       // UI actions
       setActiveTab: (tab) => set({ activeTab: tab }, false, 'setActiveTab'),

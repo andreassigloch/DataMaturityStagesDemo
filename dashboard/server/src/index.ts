@@ -14,6 +14,8 @@ import eventsRoutes from './routes/events.js';
 import feedbackRoutes from './routes/feedback.js';
 import rulesRoutes from './routes/rules.js';
 import centralityRoutes from './routes/centrality.js';
+import qualityRoutes from './routes/quality.js';
+import optimizationRoutes from './routes/optimization.js';
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
 const HOST = process.env.HOST || '0.0.0.0';
@@ -50,6 +52,8 @@ app.use('/api/events', eventsRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/rules', rulesRoutes);
 app.use('/api/centrality', centralityRoutes);
+app.use('/api/quality', qualityRoutes);
+app.use('/api/optimization', optimizationRoutes);
 
 // Error handling
 app.use(notFoundHandler);
@@ -82,6 +86,8 @@ async function start(): Promise<void> {
     GET  /api/feedback   - List feedback
     GET  /api/rules      - Validation rules
     GET  /api/centrality  - Centrality metrics
+    GET  /api/quality     - Quality data (validation, scoring, optimization)
+    GET  /api/optimization - Stufe 6: Iterative optimization state
 ========================================
 `);
     });
