@@ -1,16 +1,19 @@
 /**
- * RulesPanel Component - Display Validation Rules (Regel nodes)
+ * RulesPanel Component - Stufe 4: Regeln mit Wirkung-Filter
  * @author andreas@siglochconsulting
  */
 
 import { useEffect, useState } from 'react'
+import type { WirkungFilter } from '../schemas'
 
 interface Regel {
   id: string
   name: string
-  typ: string
-  cypher: string
-  schwere: 'fehler' | 'warnung'
+  wirkung: 'Validierung' | 'Scoring' | 'Optimierung' | null
+  ebene: string | null
+  domain: string | null
+  cypher: string | null
+  schwere: 'fehler' | 'warnung' | 'info'
   standard: string
   aktiv: boolean
   createdAt?: string
@@ -23,24 +26,47 @@ interface RulesResponse {
     active: number
     byStandard: Record<string, number>
     bySchwere: Record<string, number>
+    byWirkung: Record<string, number>
   }
 }
 
-const SCHWERE_COLORS = {
+const SCHWERE_COLORS: Record<string, string> = {
   fehler: '#EF4444',   // Red
   warnung: '#F59E0B',  // Amber
+  info: '#3B82F6',     // Blue
 }
 
-const SCHWERE_LABELS = {
+const SCHWERE_LABELS: Record<string, string> = {
   fehler: 'Fehler',
   warnung: 'Warnung',
+  info: 'Info',
 }
+
+const WIRKUNG_LABELS: Record<string, string> = {
+  Validierung: '✓ Validierung',
+  Scoring: '📊 Kennzahl',
+  Optimierung: '⚡ Optimierung',
+}
+
+const WIRKUNG_COLORS: Record<string, string> = {
+  Validierung: '#22C55E',  // Green
+  Scoring: '#3B82F6',      // Blue
+  Optimierung: '#A855F7',  // Purple
+}
+
+const WIRKUNG_FILTERS: { id: WirkungFilter; label: string; color: string }[] = [
+  { id: 'alle', label: 'Alle', color: 'var(--color-text-muted)' },
+  { id: 'Validierung', label: 'Validierung', color: '#22C55E' },
+  { id: 'Scoring', label: 'Kennzahl', color: '#3B82F6' },
+  { id: 'Optimierung', label: 'Optimierung', color: '#A855F7' },
+]
 
 export function RulesPanel() {
   const [data, setData] = useState<RulesResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [expandedRule, setExpandedRule] = useState<string | null>(null)
+  const [wirkungFilter, setWirkungFilter] = useState<WirkungFilter>('alle')
 
   useEffect(() => {
     async function fetchRules() {
@@ -87,13 +113,53 @@ export function RulesPanel() {
     )
   }
 
+  // Filter rules by wirkung
+  const filteredRules = wirkungFilter === 'alle'
+    ? data.rules
+    : data.rules.filter(rule => rule.wirkung === wirkungFilter)
+
   return (
     <div className="flex h-full flex-col" data-testid="rules-panel">
-      {/* Stats Header */}
+      {/* Header with Title */}
+      <div className="border-b border-[var(--color-border)] px-4 py-3">
+        <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">
+          Stufe 4: Regeln
+        </h2>
+        <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+          Validierungs-, Kennzahl- und Optimierungs-Regeln
+        </p>
+      </div>
+
+      {/* Wirkung Filter */}
+      <div className="flex gap-2 border-b border-[var(--color-border)] px-4 py-2" data-testid="wirkung-filter">
+        {WIRKUNG_FILTERS.map((filter) => (
+          <button
+            key={filter.id}
+            onClick={() => setWirkungFilter(filter.id)}
+            className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+              wirkungFilter === filter.id
+                ? 'text-white'
+                : 'bg-[var(--color-surface-elevated)] text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
+            }`}
+            style={wirkungFilter === filter.id ? { backgroundColor: filter.color } : undefined}
+            data-testid={`filter-${filter.id}`}
+          >
+            {filter.label}
+            {data.stats.byWirkung?.[filter.id] !== undefined && filter.id !== 'alle' && (
+              <span className="ml-1 opacity-70">({data.stats.byWirkung[filter.id] || 0})</span>
+            )}
+            {filter.id === 'alle' && (
+              <span className="ml-1 opacity-70">({data.stats.total})</span>
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* Stats Row */}
       <div className="grid grid-cols-4 gap-4 border-b border-[var(--color-border)] px-4 py-3" data-testid="rules-stats">
         <div className="rounded-lg bg-[var(--color-surface-elevated)] p-3">
-          <div className="text-xs text-[var(--color-text-muted)]">Gesamt</div>
-          <div className="text-lg font-semibold text-[var(--color-text-primary)]">{data.stats.total}</div>
+          <div className="text-xs text-[var(--color-text-muted)]">Angezeigt</div>
+          <div className="text-lg font-semibold text-[var(--color-text-primary)]">{filteredRules.length}</div>
         </div>
         <div className="rounded-lg bg-[var(--color-surface-elevated)] p-3">
           <div className="text-xs text-[var(--color-text-muted)]">Aktiv</div>
@@ -126,8 +192,13 @@ export function RulesPanel() {
 
       {/* Rules List */}
       <div className="flex-1 overflow-auto p-4">
+        {filteredRules.length === 0 ? (
+          <div className="flex h-32 items-center justify-center text-sm text-[var(--color-text-muted)]">
+            Keine Regeln mit Wirkung "{wirkungFilter}" gefunden.
+          </div>
+        ) : (
         <div className="space-y-3">
-          {data.rules.map((rule) => (
+          {filteredRules.map((rule) => (
             <div
               key={rule.id}
               className={`rounded-lg border transition-colors ${
@@ -150,17 +221,30 @@ export function RulesPanel() {
                   <div>
                     <div className="font-medium text-[var(--color-text-primary)]">{rule.name}</div>
                     <div className="flex items-center gap-2 text-xs text-[var(--color-text-muted)]">
-                      <span>{rule.typ}</span>
-                      <span>•</span>
+                      {rule.ebene && <span>{rule.ebene}</span>}
+                      {rule.ebene && <span>•</span>}
                       <span>{rule.standard}</span>
                       <span>•</span>
-                      <span>{SCHWERE_LABELS[rule.schwere]}</span>
+                      <span>{SCHWERE_LABELS[rule.schwere] || rule.schwere}</span>
+                      {rule.domain && <span>•</span>}
+                      {rule.domain && <span>{rule.domain}</span>}
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
+                  {rule.wirkung && (
+                    <span
+                      className="rounded px-2 py-0.5 text-xs text-white"
+                      style={{ backgroundColor: WIRKUNG_COLORS[rule.wirkung] || '#6B7280' }}
+                    >
+                      {WIRKUNG_LABELS[rule.wirkung] || rule.wirkung}
+                    </span>
+                  )}
                   {!rule.aktiv && (
-                    <span className="rounded bg-gray-600 px-2 py-0.5 text-xs text-gray-300">
+                    <span
+                      className="rounded bg-gray-600 px-2 py-0.5 text-xs text-gray-300"
+                      title="Diese Regel ist deaktiviert und wird bei Validierungen nicht ausgeführt"
+                    >
                       Inaktiv
                     </span>
                   )}
@@ -180,10 +264,20 @@ export function RulesPanel() {
               {/* Expanded Content */}
               {expandedRule === rule.id && (
                 <div className="border-t border-[var(--color-border)] p-4">
-                  <div className="mb-2 text-xs font-medium text-[var(--color-text-muted)]">Cypher Query:</div>
-                  <pre className="overflow-x-auto rounded bg-[var(--color-surface-elevated)] p-3 text-xs text-[var(--color-text-primary)]">
-                    {rule.cypher}
-                  </pre>
+                  {rule.cypher ? (
+                    <>
+                      <div className="mb-2 text-xs font-medium text-[var(--color-text-muted)]">
+                        {rule.wirkung === 'Scoring' ? 'Metrik-Abfrage:' : 'Validierungs-Abfrage:'}
+                      </div>
+                      <pre className="overflow-x-auto rounded bg-[var(--color-surface-elevated)] p-3 text-xs text-[var(--color-text-primary)]">
+                        {rule.cypher}
+                      </pre>
+                    </>
+                  ) : (
+                    <div className="text-xs text-[var(--color-text-muted)]">
+                      Keine Cypher-Abfrage definiert
+                    </div>
+                  )}
                   {rule.createdAt && (
                     <div className="mt-2 text-xs text-[var(--color-text-muted)]">
                       Erstellt: {new Date(rule.createdAt).toLocaleString('de-DE')}
@@ -194,6 +288,7 @@ export function RulesPanel() {
             </div>
           ))}
         </div>
+        )}
       </div>
     </div>
   )

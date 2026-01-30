@@ -6,17 +6,19 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { useDashboardStore } from './stores/dashboardStore'
 import { useSSE } from './hooks/useSSE'
-import { useGraphData, useCentralityMetrics, useQualityData } from './hooks/useGraphData'
-import { MemoryTimeline, CentralityPanel, QualityPanel, RulesPanel, OptimizationPanel } from './components'
+import { useGraphData, useCentralityMetrics } from './hooks/useGraphData'
+import { MemoryTimeline, CentralityPanel, RulesPanel, VerbesserungenPanel } from './components'
 import type { Tab } from './schemas'
 
 // Lazy load GraphView (vis-network is 500KB+)
 const GraphView = lazy(() => import('./components/GraphView'))
 
-const TABS: { id: Tab; label: string; icon: React.ReactElement }[] = [
+// Tab order matches Stufen-Modell: 1-3 Übersicht, 4 Regeln, 5 Kennzahlen, 6 Verbesserungen, 7 Lernverlauf
+const TABS: { id: Tab; label: string; stufe: string; icon: React.ReactElement }[] = [
   {
     id: 'graph',
     label: 'Übersicht',
+    stufe: '1-3',
     icon: (
       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -29,50 +31,9 @@ const TABS: { id: Tab; label: string; icon: React.ReactElement }[] = [
     ),
   },
   {
-    id: 'timeline',
-    label: 'Lernverlauf',
-    icon: (
-      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
-      </svg>
-    ),
-  },
-  {
-    id: 'centrality',
-    label: 'Wichtigkeit',
-    icon: (
-      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-        />
-      </svg>
-    ),
-  },
-  {
-    id: 'quality',
-    label: 'Qualität',
-    icon: (
-      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-        />
-      </svg>
-    ),
-  },
-  {
     id: 'rules',
-    label: 'Prüfregeln',
+    label: 'Regeln',
+    stufe: '4',
     icon: (
       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -85,8 +46,24 @@ const TABS: { id: Tab; label: string; icon: React.ReactElement }[] = [
     ),
   },
   {
-    id: 'optimization',
-    label: 'Optimierung',
+    id: 'kennzahlen',
+    label: 'Kennzahlen',
+    stufe: '5',
+    icon: (
+      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+        />
+      </svg>
+    ),
+  },
+  {
+    id: 'verbesserungen',
+    label: 'Verbesserungen',
+    stufe: '6',
     icon: (
       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -94,6 +71,21 @@ const TABS: { id: Tab; label: string; icon: React.ReactElement }[] = [
           strokeLinejoin="round"
           strokeWidth={2}
           d="M13 10V3L4 14h7v7l9-11h-7z"
+        />
+      </svg>
+    ),
+  },
+  {
+    id: 'timeline',
+    label: 'Lernverlauf',
+    stufe: '7',
+    icon: (
+      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
         />
       </svg>
     ),
@@ -218,16 +210,14 @@ function TabContent({ tab }: { tab: Tab }) {
           </div>
         </div>
       )
-    case 'timeline':
-      return <MemoryTimeline />
-    case 'centrality':
-      return <CentralityPanel />
-    case 'quality':
-      return <QualityPanel />
     case 'rules':
       return <RulesPanel />
-    case 'optimization':
-      return <OptimizationPanel />
+    case 'kennzahlen':
+      return <CentralityPanel />
+    case 'verbesserungen':
+      return <VerbesserungenPanel />
+    case 'timeline':
+      return <MemoryTimeline />
     default:
       return null
   }
@@ -249,13 +239,11 @@ export default function App() {
   // Fetch initial data
   const { refetch: refetchGraph } = useGraphData({ autoFetch: true })
   const { fetchCentrality } = useCentralityMetrics()
-  const { fetchQualityData } = useQualityData()
 
-  // Fetch centrality and quality data on mount
+  // Fetch centrality data on mount
   useEffect(() => {
     fetchCentrality()
-    fetchQualityData()
-  }, [fetchCentrality, fetchQualityData])
+  }, [fetchCentrality])
 
   return (
     <div
@@ -339,6 +327,7 @@ export default function App() {
             data-testid={`tab-${tab.id}`}
           >
             {tab.icon}
+            <span className="text-[10px] opacity-60">{tab.stufe}</span>
             {tab.label}
           </button>
         ))}

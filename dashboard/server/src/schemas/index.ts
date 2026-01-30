@@ -42,6 +42,7 @@ export const RulesResponseSchema = z.object({
     active: z.number(),
     byStandard: z.record(z.number()),
     bySchwere: z.record(z.number()),
+    byWirkung: z.record(z.number()).optional(),
   }),
 })
 export type RulesResponse = z.infer<typeof RulesResponseSchema>

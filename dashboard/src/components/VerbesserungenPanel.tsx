@@ -1,6 +1,6 @@
 /**
- * OptimizationPanel Component - Stufe 6: Iterative Architektur-Optimierung
- * CR-015: Modul-Kohäsion mit Progress-Tracking
+ * VerbesserungenPanel Component - Stufe 6: OPT-Vorschläge
+ * Zeigt Optimierungs-Vorschläge angewendet auf Requirements
  * @author andreas@siglochconsulting
  */
 
@@ -40,7 +40,6 @@ function ProgressBar({ percent, target }: { percent: number; target: number }) {
 
   return (
     <div className="relative h-4 w-full overflow-hidden rounded-full bg-[var(--color-surface-elevated)]">
-      {/* Progress fill */}
       <div
         className="h-full rounded-full transition-all duration-500"
         style={{
@@ -48,13 +47,11 @@ function ProgressBar({ percent, target }: { percent: number; target: number }) {
           backgroundColor: isAchieved ? 'var(--color-success)' : 'var(--color-primary)',
         }}
       />
-      {/* Target marker */}
       <div
         className="absolute top-0 h-full w-0.5 bg-[var(--color-text-muted)]"
         style={{ left: `${targetPercent}%` }}
         title={`Ziel: ${target * 100}%`}
       />
-      {/* Percentage text */}
       <span className="absolute inset-0 flex items-center justify-center text-xs font-medium text-[var(--color-text-primary)]">
         {percent}%
       </span>
@@ -115,14 +112,12 @@ function OptimizationCard({ state }: { state: OptimizationState }) {
   const [isExpanded, setIsExpanded] = useState(true)
 
   const handleApplySuggestion = (suggestion: OptimizationSuggestion) => {
-    // TODO: Implement actual optimization via API
     console.log('Apply suggestion:', suggestion)
     alert(`Vorschlag "${suggestion.kandidat}" würde angewendet werden.\n\nIn der Demo nicht implementiert.`)
   }
 
   return (
     <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)]">
-      {/* Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-[var(--color-surface-elevated)]"
@@ -156,7 +151,6 @@ function OptimizationCard({ state }: { state: OptimizationState }) {
 
       {isExpanded && (
         <div className="border-t border-[var(--color-border)] p-4">
-          {/* Progress */}
           <div className="mb-4">
             <div className="mb-2 flex items-center justify-between text-sm">
               <span className="text-[var(--color-text-muted)]">Fortschritt</span>
@@ -167,11 +161,10 @@ function OptimizationCard({ state }: { state: OptimizationState }) {
             <ProgressBar percent={state.progressPercent} target={state.targetMetric} />
           </div>
 
-          {/* Suggestions */}
           {state.suggestions.length > 0 ? (
             <div>
               <h4 className="mb-2 text-sm font-medium text-[var(--color-text-primary)]">
-                Optimierungsvorschläge ({state.suggestions.length})
+                Vorschläge ({state.suggestions.length})
               </h4>
               <div className="space-y-2">
                 {state.suggestions.map((suggestion, idx) => (
@@ -185,11 +178,10 @@ function OptimizationCard({ state }: { state: OptimizationState }) {
             </div>
           ) : (
             <p className="text-sm text-[var(--color-text-muted)]">
-              Keine Optimierungsvorschläge verfügbar.
+              Keine Verbesserungsvorschläge verfügbar.
             </p>
           )}
 
-          {/* History (if any) */}
           {state.history.length > 0 && (
             <div className="mt-4 border-t border-[var(--color-border)] pt-4">
               <h4 className="mb-2 text-sm font-medium text-[var(--color-text-primary)]">
@@ -214,7 +206,7 @@ function OptimizationCard({ state }: { state: OptimizationState }) {
   )
 }
 
-export function OptimizationPanel() {
+export function VerbesserungenPanel() {
   const [optimizationStates, setOptimizationStates] = useState<OptimizationState[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -231,7 +223,7 @@ export function OptimizationPanel() {
         setOptimizationStates(data)
         setError(null)
       } catch (err) {
-        console.error('[OptimizationPanel] Fetch error:', err)
+        console.error('[VerbesserungenPanel] Fetch error:', err)
         setError(err instanceof Error ? err.message : 'Fehler beim Laden')
       } finally {
         setIsLoading(false)
@@ -246,7 +238,7 @@ export function OptimizationPanel() {
       <div className="flex h-full items-center justify-center p-8">
         <div className="text-center">
           <div className="mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-2 border-[var(--color-primary)] border-t-transparent" />
-          <p className="text-sm text-[var(--color-text-muted)]">Lade Optimierungsdaten...</p>
+          <p className="text-sm text-[var(--color-text-muted)]">Lade Verbesserungsvorschläge...</p>
         </div>
       </div>
     )
@@ -267,28 +259,38 @@ export function OptimizationPanel() {
 
   if (optimizationStates.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center p-8">
-        <div className="text-center">
-          <p className="text-sm text-[var(--color-text-muted)]">
-            Keine Optimierungs-Regeln gefunden.
+      <div className="flex h-full flex-col" data-testid="verbesserungen-panel">
+        <div className="border-b border-[var(--color-border)] px-4 py-3">
+          <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">
+            Stufe 6: Verbesserungen
+          </h2>
+          <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+            OPT-Regeln mit konkreten Optimierungsvorschlägen
           </p>
-          <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-            OPT-Regeln mit wirkung='Optimierung' werden hier angezeigt.
-          </p>
+        </div>
+        <div className="flex flex-1 items-center justify-center p-8">
+          <div className="text-center">
+            <p className="text-sm text-[var(--color-text-muted)]">
+              Keine OPT-Regeln gefunden.
+            </p>
+            <p className="mt-1 text-xs text-[var(--color-text-muted)]">
+              Regeln mit wirkung='Optimierung' werden hier angezeigt.
+            </p>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="flex h-full flex-col" data-testid="optimization-panel">
+    <div className="flex h-full flex-col" data-testid="verbesserungen-panel">
       {/* Header */}
       <div className="border-b border-[var(--color-border)] px-4 py-3">
         <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">
-          Stufe 6: Architektur-Optimierung
+          Stufe 6: Verbesserungen
         </h2>
         <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-          Iterative Verbesserung der Systemstruktur basierend auf Metriken
+          OPT-Regeln mit konkreten Optimierungsvorschlägen
         </p>
       </div>
 

@@ -28,13 +28,14 @@ import {
 // UI-Only Schemas (not part of API contract)
 // =============================================================================
 
-// Tab configuration (UI navigation)
-export const TabSchema = z.enum(['graph', 'timeline', 'centrality', 'quality', 'rules', 'optimization'])
+// Tab configuration (UI navigation) - Aligned with Stufen model
+// Stufe 1-3: graph, Stufe 4: rules, Stufe 5: kennzahlen, Stufe 6: verbesserungen, Stufe 7: timeline
+export const TabSchema = z.enum(['graph', 'rules', 'kennzahlen', 'verbesserungen', 'timeline'])
 export type Tab = z.infer<typeof TabSchema>
 
-// Quality sub-tabs
-export const QualityTabSchema = z.enum(['validierung', 'scoring', 'optimierung'])
-export type QualityTab = z.infer<typeof QualityTabSchema>
+// Wirkung filter for rules
+export const WirkungFilterSchema = z.enum(['alle', 'Validierung', 'Scoring', 'Optimierung'])
+export type WirkungFilter = z.infer<typeof WirkungFilterSchema>
 
 // Filter state (UI state)
 import { NodeTypeSchema } from '@maturity/schemas'

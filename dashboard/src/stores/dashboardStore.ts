@@ -15,10 +15,6 @@ import type {
   Tab,
   FilterState,
   NodeType,
-  ValidationResult,
-  ScoringResult,
-  OptimizationResult,
-  QualityTab,
 } from '../schemas'
 import {
   MOCK_CENTRALITY_METRICS,
@@ -46,12 +42,6 @@ interface DashboardState {
   detectedPatterns: DetectedPattern[]
   selectedPatternId: string | null
 
-  // CR-010: Quality data (Validierung, Scoring, Optimierung)
-  validationResult: ValidationResult | null
-  scoringResult: ScoringResult | null
-  optimizationResult: OptimizationResult | null
-  activeQualityTab: QualityTab
-
   // UI state
   activeTab: Tab
   filters: FilterState
@@ -77,12 +67,6 @@ interface DashboardState {
 
   addPattern: (pattern: DetectedPattern) => void
   selectPattern: (patternId: string | null) => void
-
-  // CR-010: Quality actions
-  setValidationResult: (result: ValidationResult | null) => void
-  setScoringResult: (result: ScoringResult | null) => void
-  setOptimizationResult: (result: OptimizationResult | null) => void
-  setActiveQualityTab: (tab: QualityTab) => void
 
   setActiveTab: (tab: Tab) => void
   updateFilters: (filters: Partial<FilterState>) => void
@@ -126,12 +110,6 @@ export const useDashboardStore = create<DashboardState>()(
 
       detectedPatterns: MOCK_DETECTED_PATTERNS,
       selectedPatternId: null,
-
-      // CR-010: Quality data initial state
-      validationResult: null,
-      scoringResult: null,
-      optimizationResult: null,
-      activeQualityTab: 'validierung',
 
       activeTab: 'graph',
       filters: defaultFilters,
@@ -232,19 +210,6 @@ export const useDashboardStore = create<DashboardState>()(
           'selectPattern'
         )
       },
-
-      // CR-010: Quality actions
-      setValidationResult: (result) =>
-        set({ validationResult: result }, false, 'setValidationResult'),
-
-      setScoringResult: (result) =>
-        set({ scoringResult: result }, false, 'setScoringResult'),
-
-      setOptimizationResult: (result) =>
-        set({ optimizationResult: result }, false, 'setOptimizationResult'),
-
-      setActiveQualityTab: (tab) =>
-        set({ activeQualityTab: tab }, false, 'setActiveQualityTab'),
 
       // UI actions
       setActiveTab: (tab) => set({ activeTab: tab }, false, 'setActiveTab'),

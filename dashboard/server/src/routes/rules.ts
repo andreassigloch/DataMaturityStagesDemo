@@ -18,20 +18,24 @@ router.get('/', async (_req: Request, res: Response): Promise<void> => {
   const session = getReadSession();
 
   try {
+    // CR-010: Updated query for new rule schema
     const result = await session.run(`
       MATCH (r:Regel)
       RETURN
         r.id AS id,
         r.name AS name,
-        r.typ AS typ,
+        r.wirkung AS wirkung,
+        r.ebene AS ebene,
+        r.domain AS domain,
         r.cypher AS cypher,
         r.schwere AS schwere,
         r.standard AS standard,
         COALESCE(r.aktiv, true) AS aktiv,
-        r.createdAt AS createdAt
-      ORDER BY r.standard, r.name
+        r.erstelltAm AS createdAt
+      ORDER BY r.wirkung, r.standard, r.name
     `);
 
+    // CR-010: Updated mapping for new rule schema
     const rules = result.records.map(record => {
       const createdAtRaw = record.get('createdAt');
       let createdAt: string | undefined;
@@ -46,9 +50,11 @@ router.get('/', async (_req: Request, res: Response): Promise<void> => {
       return {
         id: record.get('id') as string,
         name: record.get('name') as string,
-        typ: record.get('typ') as string,
-        cypher: record.get('cypher') as string,
-        schwere: record.get('schwere') as 'fehler' | 'warnung',
+        wirkung: record.get('wirkung') as string | null,
+        ebene: record.get('ebene') as string | null,
+        domain: record.get('domain') as string | null,
+        cypher: record.get('cypher') as string | null,
+        schwere: record.get('schwere') as 'fehler' | 'warnung' | 'info',
         standard: record.get('standard') as string,
         aktiv: record.get('aktiv') as boolean,
         createdAt,
@@ -58,11 +64,15 @@ router.get('/', async (_req: Request, res: Response): Promise<void> => {
     // Calculate stats
     const byStandard: Record<string, number> = {};
     const bySchwere: Record<string, number> = {};
+    const byWirkung: Record<string, number> = {};
     let active = 0;
 
     for (const rule of rules) {
       byStandard[rule.standard] = (byStandard[rule.standard] || 0) + 1;
       bySchwere[rule.schwere] = (bySchwere[rule.schwere] || 0) + 1;
+      if (rule.wirkung) {
+        byWirkung[rule.wirkung] = (byWirkung[rule.wirkung] || 0) + 1;
+      }
       if (rule.aktiv) active++;
     }
 
@@ -73,6 +83,7 @@ router.get('/', async (_req: Request, res: Response): Promise<void> => {
         active,
         byStandard,
         bySchwere,
+        byWirkung,
       },
     });
 
