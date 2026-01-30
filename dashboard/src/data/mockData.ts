@@ -82,15 +82,18 @@ export const MOCK_DETECTED_PATTERNS: DetectedPattern[] = [
 
 /**
  * Mock Memory Events - Lernverlauf
- * CR-016: Erweitert um Chat-Sequenzen als Regelquellen
- * Zeigt was das System gelernt hat und woher die Regeln stammen
+ * CR-017: Verwendet quelle/aktion Taxonomie
+ *
+ * Quellen: manuell, feedback, pattern, chat, import, similar
+ * Aktionen: created, confirmed, derived, updated, consolidated, rejected
  */
 export const MOCK_MEMORY_EVENTS: MemoryEvent[] = [
-  // CR-016: Chat-basierte Regel-Ableitung (Hauptbeispiel)
+  // Chat → Derived: Aus Chat-Diskussion eine Regel abgeleitet
   {
     id: 'event-chat-1',
-    eventType: 'chat',
-    description: 'Aus Chat-Diskussion: ASIL-Klassifizierung muss immer angegeben werden',
+    quelle: 'chat',
+    aktion: 'derived',
+    beschreibung: 'Aus Chat-Diskussion: ASIL-Klassifizierung muss immer angegeben werden',
     timestamp: new Date(Date.now() - 1000 * 60 * 1).toISOString(),
     relatedNodes: ['SYS-003', 'SYS-005'],
     chatPreview: {
@@ -102,11 +105,12 @@ export const MOCK_MEMORY_EVENTS: MemoryEvent[] = [
       name: 'ASIL-Pflicht',
     },
   },
-  // CR-016: Feedback-basierte Regel
+  // Feedback → Created: Aus User-Feedback eine neue Regel erstellt
   {
     id: 'event-feedback-1',
-    eventType: 'feedback',
-    description: 'User-Feedback: "Unklare Zeitangaben" markiert bei SYS-003',
+    quelle: 'feedback',
+    aktion: 'created',
+    beschreibung: 'User-Feedback: "Unklare Zeitangaben" markiert bei SYS-003',
     timestamp: new Date(Date.now() - 1000 * 60 * 3).toISOString(),
     relatedNodes: ['SYS-003'],
     derivedRule: {
@@ -114,11 +118,12 @@ export const MOCK_MEMORY_EVENTS: MemoryEvent[] = [
       name: 'Zeitangaben präzisieren',
     },
   },
-  // CR-016: Pattern-basierte Regel
+  // Pattern → Derived: Aus erkanntem Pattern eine Regel abgeleitet
   {
     id: 'event-pattern-1',
-    eventType: 'pattern',
-    description: 'Pattern erkannt: 3x gleiches Feedback "fehlender Test" → Regel generiert',
+    quelle: 'pattern',
+    aktion: 'derived',
+    beschreibung: 'Pattern erkannt: 3x gleiches Feedback "fehlender Test" → Regel generiert',
     timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
     relatedNodes: ['SW-003', 'SW-007', 'SW-009'],
     derivedRule: {
@@ -126,47 +131,57 @@ export const MOCK_MEMORY_EVENTS: MemoryEvent[] = [
       name: 'Test-Pflicht für SoftwareReq',
     },
   },
-  // Bestehende Events
+  // Pattern → Created: Neues Pattern erkannt
   {
-    id: 'event-1',
-    eventType: 'learn',
-    description: 'Muster erkannt: Zeitangaben sollten als Bereich (30-50ms) statt Grenzwert (<50ms) angegeben werden',
+    id: 'event-pattern-2',
+    quelle: 'pattern',
+    aktion: 'created',
+    beschreibung: 'Muster erkannt: Zeitangaben sollten als Bereich (30-50ms) statt Grenzwert (<50ms) angegeben werden',
     timestamp: new Date(Date.now() - 1000 * 60 * 8).toISOString(),
     relatedNodes: ['SYS-003', 'SYS-001'],
   },
+  // Similar → Created: Ähnlichkeit zu anderem Projekt gefunden
   {
-    id: 'event-2',
-    eventType: 'connect',
-    description: 'Verbindung gefunden: EXT-001 (Fahrwerk) beeinflusst SYS-003 und SW-002 (Außenlicht)',
+    id: 'event-similar-1',
+    quelle: 'similar',
+    aktion: 'created',
+    beschreibung: 'Ähnliches Problem in anderem Projekt: Fehlende Tests für Override-Funktionen',
     timestamp: new Date(Date.now() - 1000 * 60 * 12).toISOString(),
-    relatedNodes: ['EXT-001', 'SYS-003', 'SW-002'],
-  },
-  {
-    id: 'event-3',
-    eventType: 'recall',
-    description: 'Ähnliches Problem in anderem Projekt: Fehlende Tests für Override-Funktionen',
-    timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
     relatedNodes: ['SW-003'],
   },
+  // Import → Confirmed: Importierte Regel bestätigt
   {
-    id: 'event-4',
-    eventType: 'strengthen',
-    description: 'Regel bestätigt: A-SPICE fordert Test für jedes Software-Requirement',
-    timestamp: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
+    id: 'event-import-1',
+    quelle: 'import',
+    aktion: 'confirmed',
+    beschreibung: 'A-SPICE Regel importiert und bestätigt: Test für jedes Software-Requirement',
+    timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
     relatedNodes: ['SW-003', 'VAL-002'],
   },
+  // Pattern → Consolidated: Mehrere Erkenntnisse zusammengeführt
   {
-    id: 'event-5',
-    eventType: 'consolidate',
-    description: 'Wissen zusammengefasst: 3 ähnliche Qualitätsprobleme bei Zeitangaben',
-    timestamp: new Date(Date.now() - 1000 * 60 * 22).toISOString(),
+    id: 'event-pattern-3',
+    quelle: 'pattern',
+    aktion: 'consolidated',
+    beschreibung: 'Wissen zusammengefasst: 3 ähnliche Qualitätsprobleme bei Zeitangaben',
+    timestamp: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
     relatedNodes: ['SYS-003', 'SYS-001', 'EXT-003'],
   },
-  // CR-016: Zweites Chat-Beispiel (ältere Konversation)
+  // Manuell → Created: Manuell eingetragene Regel
+  {
+    id: 'event-manuell-1',
+    quelle: 'manuell',
+    aktion: 'created',
+    beschreibung: 'Manuell erfasst: Bremslicht-Anforderungen haben Priorität D',
+    timestamp: new Date(Date.now() - 1000 * 60 * 22).toISOString(),
+    relatedNodes: ['SYS-003', 'SW-002'],
+  },
+  // Chat → Derived: Zweites Chat-Beispiel
   {
     id: 'event-chat-2',
-    eventType: 'chat',
-    description: 'Aus Chat: Sicherheitskritische Anforderungen müssen Review-Status haben',
+    quelle: 'chat',
+    aktion: 'derived',
+    beschreibung: 'Aus Chat: Sicherheitskritische Anforderungen müssen Review-Status haben',
     timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
     relatedNodes: ['STK-002', 'SYS-003'],
     chatPreview: {
@@ -177,6 +192,15 @@ export const MOCK_MEMORY_EVENTS: MemoryEvent[] = [
       id: 'VAL-007',
       name: 'Review für Safety-Req',
     },
+  },
+  // Feedback → Rejected: Feedback wurde abgelehnt
+  {
+    id: 'event-feedback-2',
+    quelle: 'feedback',
+    aktion: 'rejected',
+    beschreibung: 'Vorschlag abgelehnt: "Alle Requirements auf Englisch" - nicht projektkonform',
+    timestamp: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
+    relatedNodes: [],
   },
 ]
 
