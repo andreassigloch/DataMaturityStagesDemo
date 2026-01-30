@@ -203,16 +203,6 @@ export function CentralityPanel() {
 
   return (
     <div className="flex h-full flex-col" data-testid="centrality-panel">
-      {/* Header with Title */}
-      <div className="border-b border-[var(--color-border)] px-4 py-3">
-        <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">
-          Stufe 5: Kennzahlen
-        </h2>
-        <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-          Impact, Change-Risk und Review-Priorität basierend auf ASIL
-        </p>
-      </div>
-
       {/* Header stats (CR-014: drei Wichtungen) */}
       <div
         className="grid grid-cols-3 gap-3 border-b border-[var(--color-border)] px-4 py-3"

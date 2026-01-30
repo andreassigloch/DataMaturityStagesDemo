@@ -14,11 +14,10 @@ import type { Tab } from './schemas'
 const GraphView = lazy(() => import('./components/GraphView'))
 
 // Tab order matches Stufen-Modell: 1-3 Übersicht, 4 Regeln, 5 Kennzahlen, 6 Verbesserungen, 7 Lernverlauf
-const TABS: { id: Tab; label: string; stufe: string; icon: React.ReactElement }[] = [
+const TABS: { id: Tab; label: string; icon: React.ReactElement }[] = [
   {
     id: 'graph',
-    label: 'Übersicht',
-    stufe: '1-3',
+    label: '1-3 Übersicht',
     icon: (
       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -32,8 +31,7 @@ const TABS: { id: Tab; label: string; stufe: string; icon: React.ReactElement }[
   },
   {
     id: 'rules',
-    label: 'Regeln',
-    stufe: '4',
+    label: '4 Regeln',
     icon: (
       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -47,8 +45,7 @@ const TABS: { id: Tab; label: string; stufe: string; icon: React.ReactElement }[
   },
   {
     id: 'kennzahlen',
-    label: 'Kennzahlen',
-    stufe: '5',
+    label: '5 Kennzahlen',
     icon: (
       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -62,8 +59,7 @@ const TABS: { id: Tab; label: string; stufe: string; icon: React.ReactElement }[
   },
   {
     id: 'verbesserungen',
-    label: 'Verbesserungen',
-    stufe: '6',
+    label: '6 Verbesserungen',
     icon: (
       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -77,8 +73,7 @@ const TABS: { id: Tab; label: string; stufe: string; icon: React.ReactElement }[
   },
   {
     id: 'timeline',
-    label: 'Lernverlauf',
-    stufe: '7',
+    label: '7 Lernverlauf',
     icon: (
       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -327,7 +322,6 @@ export default function App() {
             data-testid={`tab-${tab.id}`}
           >
             {tab.icon}
-            <span className="text-[10px] opacity-60">{tab.stufe}</span>
             {tab.label}
           </button>
         ))}

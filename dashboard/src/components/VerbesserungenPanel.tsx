@@ -259,24 +259,14 @@ export function VerbesserungenPanel() {
 
   if (optimizationStates.length === 0) {
     return (
-      <div className="flex h-full flex-col" data-testid="verbesserungen-panel">
-        <div className="border-b border-[var(--color-border)] px-4 py-3">
-          <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">
-            Stufe 6: Verbesserungen
-          </h2>
-          <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-            OPT-Regeln mit konkreten Optimierungsvorschlägen
+      <div className="flex h-full items-center justify-center p-8" data-testid="verbesserungen-panel">
+        <div className="text-center">
+          <p className="text-sm text-[var(--color-text-muted)]">
+            Keine OPT-Regeln gefunden.
           </p>
-        </div>
-        <div className="flex flex-1 items-center justify-center p-8">
-          <div className="text-center">
-            <p className="text-sm text-[var(--color-text-muted)]">
-              Keine OPT-Regeln gefunden.
-            </p>
-            <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-              Regeln mit wirkung='Optimierung' werden hier angezeigt.
-            </p>
-          </div>
+          <p className="mt-1 text-xs text-[var(--color-text-muted)]">
+            Regeln mit wirkung='Optimierung' werden hier angezeigt.
+          </p>
         </div>
       </div>
     )
@@ -284,16 +274,6 @@ export function VerbesserungenPanel() {
 
   return (
     <div className="flex h-full flex-col" data-testid="verbesserungen-panel">
-      {/* Header */}
-      <div className="border-b border-[var(--color-border)] px-4 py-3">
-        <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">
-          Stufe 6: Verbesserungen
-        </h2>
-        <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-          OPT-Regeln mit konkreten Optimierungsvorschlägen
-        </p>
-      </div>
-
       {/* Content */}
       <div className="flex-1 overflow-auto p-4">
         <div className="space-y-4">

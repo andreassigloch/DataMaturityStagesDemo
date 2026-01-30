@@ -120,16 +120,6 @@ export function RulesPanel() {
 
   return (
     <div className="flex h-full flex-col" data-testid="rules-panel">
-      {/* Header with Title */}
-      <div className="border-b border-[var(--color-border)] px-4 py-3">
-        <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">
-          Stufe 4: Regeln
-        </h2>
-        <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-          Validierungs-, Kennzahl- und Optimierungs-Regeln
-        </p>
-      </div>
-
       {/* Wirkung Filter */}
       <div className="flex gap-2 border-b border-[var(--color-border)] px-4 py-2" data-testid="wirkung-filter">
         {WIRKUNG_FILTERS.map((filter) => (
