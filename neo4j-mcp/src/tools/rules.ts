@@ -1,11 +1,34 @@
 import { Driver } from 'neo4j-driver';
 
+// CR-010: Extended type definitions
+export type Wirkung = 'Validierung' | 'Scoring' | 'Optimierung';
+export type Ebene = 'Struktur' | 'Inhalt' | 'Konsistenz' | 'Vollstaendigkeit';
+export type Domain = 'Traceability' | 'Safety' | 'Quality' | 'Architektur';
+export type Schwere = 'fehler' | 'warnung' | 'info';
+export type Richtung = 'minimieren' | 'maximieren';
+export type Operator = 'SPLIT' | 'MERGE' | 'MOVE' | 'CREATE';
+export type Quelle = 'manuell' | 'pattern' | 'feedback' | 'import';
+
+// CR-010: Extended AddRuleParams with functional schema
 export interface AddRuleParams {
   name: string;
-  typ: string;
+  beschreibung?: string;
+  // Function taxonomy
+  ebene: Ebene;
+  wirkung: Wirkung;
+  // Check logic
   cypher: string;
-  schwere: 'fehler' | 'warnung';
+  cypher_measure?: string;  // For Scoring/Optimierung
+  schwellwert?: number;     // Threshold
+  richtung?: Richtung;      // minimieren|maximieren
+  operator?: Operator;      // SPLIT|MERGE|MOVE|CREATE
+  // Context
+  schwere: Schwere;
+  domain: Domain;
   standard: string;
+  // Learning metadata
+  quelle?: Quelle;
+  confidence?: number;
 }
 
 export interface AddRuleResult {
@@ -18,17 +41,31 @@ export async function addRule(driver: Driver, params: AddRuleParams): Promise<Ad
   const session = driver.session({ defaultAccessMode: 'WRITE' });
 
   try {
-    // Generate unique ID based on timestamp and type
-    const ruleId = `REGEL-${params.typ.toUpperCase().substring(0, 3)}-${Date.now()}`;
+    // CR-010: Generate ID based on wirkung type
+    const prefix = params.wirkung === 'Validierung' ? 'VAL'
+      : params.wirkung === 'Scoring' ? 'SCO'
+      : 'OPT';
+    const ruleId = `${prefix}-${Date.now()}`;
 
     await session.run(
       `CREATE (r:Regel {
         id: $id,
         name: $name,
-        typ: $typ,
+        beschreibung: $beschreibung,
+        ebene: $ebene,
+        wirkung: $wirkung,
         cypher: $cypher,
+        cypher_measure: $cypherMeasure,
+        schwellwert: $schwellwert,
+        richtung: $richtung,
+        operator: $operator,
         schwere: $schwere,
+        domain: $domain,
         standard: $standard,
+        quelle: $quelle,
+        confidence: $confidence,
+        anwendungen: 0,
+        treffer: 0,
         aktiv: true,
         erstelltAm: datetime()
       })
@@ -36,10 +73,19 @@ export async function addRule(driver: Driver, params: AddRuleParams): Promise<Ad
       {
         id: ruleId,
         name: params.name,
-        typ: params.typ,
+        beschreibung: params.beschreibung || null,
+        ebene: params.ebene,
+        wirkung: params.wirkung,
         cypher: params.cypher,
+        cypherMeasure: params.cypher_measure || null,
+        schwellwert: params.schwellwert ?? null,
+        richtung: params.richtung || null,
+        operator: params.operator || null,
         schwere: params.schwere,
-        standard: params.standard
+        domain: params.domain,
+        standard: params.standard,
+        quelle: params.quelle || 'manuell',
+        confidence: params.confidence ?? 1.0
       }
     );
 
