@@ -1,0 +1,68 @@
+1
+00:00:00,000 --> 00:00:05,000
+4 Dokumente. 4 Formate.
+
+2
+00:00:05,000 --> 00:00:10,000
+Kein Zusammenhang.
+
+3
+00:00:10,000 --> 00:00:15,000
+Suche findet Text...
+
+4
+00:00:15,000 --> 00:00:20,000
+...aber keine Zusammenhänge.
+
+5
+00:00:20,000 --> 00:00:25,000
+Strukturierte Übersicht
+
+6
+00:00:25,000 --> 00:00:35,000
+Vom Kundenwunsch zur Software
+
+7
+00:00:35,000 --> 00:00:42,000
+Lückenlose Nachverfolgung
+
+8
+00:00:42,000 --> 00:00:50,000
+5 Prüfregeln aus A-SPICE und ISO 26262
+
+9
+00:00:50,000 --> 00:00:55,000
+SW-003 hat keinen Test!
+
+10
+00:00:55,000 --> 00:01:05,000
+Das andere Team ändert etwas
+
+11
+00:01:05,000 --> 00:01:12,000
+Sofort sehen: Was ist betroffen?
+
+12
+00:01:12,000 --> 00:01:20,000
+Das System weiß es. Sie auch.
+
+13
+00:01:20,000 --> 00:01:30,000
+Von Dokumenten zu Wissen
+
+14
+00:01:30,000 --> 00:01:40,000
+Kritische Stellen erkennen
+
+15
+00:01:40,000 --> 00:01:50,000
+Lücken automatisch finden
+
+16
+00:01:50,000 --> 00:01:55,000
+Pilot in 4-6 Wochen
+
+17
+00:01:55,000 --> 00:02:00,000
+siglochconsulting.de
+

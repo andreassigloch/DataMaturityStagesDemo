@@ -1,0 +1,364 @@
+{
+  "version": "1.0",
+  "title": "Requirements Traceability mit Knowledge Graph",
+  "output": {
+    "2min": "demo-requirements-traceability-2min.mp4",
+    "8min": "demo-requirements-traceability-8min.mp4"
+  },
+  "settings": {
+    "resolution": "1920x1080",
+    "fps": 30,
+    "transition": "crossfade",
+    "transitionDuration": 0.5,
+    "fontFamily": "Inter",
+    "fontSize": 48,
+    "fontColor": "#FFFFFF",
+    "fontShadow": true,
+    "backgroundColor": "#1a1a2e"
+  },
+  "frames_2min": [
+    {
+      "id": "01-title",
+      "type": "title",
+      "duration": 3,
+      "text": "Requirements Traceability",
+      "subtext": "Von PDFs zu Wissen",
+      "background": "#1a1a2e"
+    },
+    {
+      "id": "02-pdfs",
+      "type": "screenshot",
+      "duration": 5,
+      "source": "finder-pdfs.png",
+      "overlay": "4 Dokumente. 4 Formate.",
+      "overlayPosition": "bottom"
+    },
+    {
+      "id": "03-problem",
+      "type": "screenshot",
+      "duration": 4,
+      "source": "finder-pdfs.png",
+      "overlay": "Keine Verbindung.",
+      "overlayPosition": "bottom",
+      "overlayColor": "#ff6b6b"
+    },
+    {
+      "id": "04-rag-limit",
+      "type": "text",
+      "duration": 5,
+      "text": "RAG findet Text...\n...aber keine Beziehungen.",
+      "background": "#1a1a2e"
+    },
+    {
+      "id": "05-graph",
+      "type": "screenshot",
+      "duration": 8,
+      "source": "04-dashboard-overview.png",
+      "overlay": "Knowledge Graph: Struktur statt Suche",
+      "overlayPosition": "top"
+    },
+    {
+      "id": "06-hierarchy",
+      "type": "screenshot",
+      "duration": 6,
+      "source": "04-dashboard-overview.png",
+      "overlay": "STK → SYS → SW\nVollständige Traceability",
+      "overlayPosition": "bottom"
+    },
+    {
+      "id": "07-rules",
+      "type": "screenshot",
+      "duration": 6,
+      "source": "07-dashboard-rules.png",
+      "overlay": "5 Regeln aus A-SPICE & ISO 26262",
+      "overlayPosition": "top"
+    },
+    {
+      "id": "08-violation",
+      "type": "text",
+      "duration": 5,
+      "text": "SW-003 hat KEINEN Test!\n\nDas wäre ein Audit-Finding.",
+      "background": "#2d1f1f",
+      "textColor": "#ff6b6b"
+    },
+    {
+      "id": "09-impact",
+      "type": "text",
+      "duration": 6,
+      "text": "Impact-Analyse:\nEXT-001 ändert sich\n\n→ 2 Requirements betroffen",
+      "background": "#1a1a2e"
+    },
+    {
+      "id": "10-ml",
+      "type": "screenshot",
+      "duration": 5,
+      "source": "05-dashboard-centrality.png",
+      "overlay": "SYS-003 = wichtigstes Requirement",
+      "overlayPosition": "bottom"
+    },
+    {
+      "id": "11-cta",
+      "type": "title",
+      "duration": 5,
+      "text": "Von PDFs zu Wissen",
+      "subtext": "Pilot in 4-6 Wochen",
+      "background": "#1a1a2e"
+    },
+    {
+      "id": "12-contact",
+      "type": "title",
+      "duration": 4,
+      "text": "siglochconsulting.de",
+      "background": "#0a0a14"
+    }
+  ],
+  "frames_8min": [
+    {
+      "id": "01-title",
+      "type": "title",
+      "duration": 5,
+      "text": "Requirements Traceability",
+      "subtext": "Von PDFs zu Wissen",
+      "chapter": "Intro"
+    },
+    {
+      "id": "02-chapter1-title",
+      "type": "chapter",
+      "duration": 3,
+      "text": "Kapitel 1: Das Problem",
+      "chapterNumber": 1
+    },
+    {
+      "id": "03-pdfs",
+      "type": "screenshot",
+      "duration": 8,
+      "source": "finder-pdfs.png",
+      "overlay": "4 Dokumente • 4 Teams • 4 Formate"
+    },
+    {
+      "id": "04-no-connection",
+      "type": "text",
+      "duration": 5,
+      "text": "Keine Verbindung.",
+      "textColor": "#ff6b6b"
+    },
+    {
+      "id": "05-chapter2-title",
+      "type": "chapter",
+      "duration": 3,
+      "text": "Kapitel 2: RAG-Grenze",
+      "chapterNumber": 2
+    },
+    {
+      "id": "06-rag-works",
+      "type": "text",
+      "duration": 6,
+      "text": "Suche funktioniert:\n\n• STK-002: Bremsvorgang erkennbar\n• SYS-003: Bremslicht <50ms\n• SYS-004: Bremslicht 80-300cd",
+      "textColor": "#4ade80"
+    },
+    {
+      "id": "07-rag-fails",
+      "type": "text",
+      "duration": 8,
+      "text": "Aber:\n\"Erfüllt unser System die A-SPICE Anforderungen?\"\n\n→ RAG kann keine Beziehungen prüfen",
+      "textColor": "#ff6b6b"
+    },
+    {
+      "id": "08-chapter3-title",
+      "type": "chapter",
+      "duration": 3,
+      "text": "Kapitel 3: Knowledge Graph",
+      "chapterNumber": 3
+    },
+    {
+      "id": "09-graph-intro",
+      "type": "text",
+      "duration": 4,
+      "text": "Jetzt aktivieren wir\nden Knowledge Graph"
+    },
+    {
+      "id": "10-graph-view",
+      "type": "screenshot",
+      "duration": 10,
+      "source": "04-dashboard-overview.png",
+      "overlay": "26 Nodes • 23 Edges"
+    },
+    {
+      "id": "11-hierarchy",
+      "type": "text",
+      "duration": 8,
+      "text": "Requirement-Hierarchie:\n\nSTK-001 → SYS-001 → SW-001\nSTK-002 → SYS-003 → SW-002\nSTK-004 → SYS-006 → SW-003\n        → SYS-007 → SW-004"
+    },
+    {
+      "id": "12-structure",
+      "type": "screenshot",
+      "duration": 6,
+      "source": "04-dashboard-overview.png",
+      "overlay": "Struktur statt Suche"
+    },
+    {
+      "id": "13-chapter4-title",
+      "type": "chapter",
+      "duration": 3,
+      "text": "Kapitel 4: Regel-Validierung",
+      "chapterNumber": 4
+    },
+    {
+      "id": "14-rules-overview",
+      "type": "screenshot",
+      "duration": 8,
+      "source": "07-dashboard-rules.png",
+      "overlay": "5 Regeln: A-SPICE (3) + ISO 26262 (2)"
+    },
+    {
+      "id": "15-rule-example",
+      "type": "text",
+      "duration": 8,
+      "text": "Regel: Test-Coverage (A-SPICE)\n\n\"Jedes SoftwareReq muss\neinen Test haben\"\n\nCypher:\nMATCH (sw:SoftwareReq)\nWHERE NOT (sw)-[:VERIFIED_BY]->(:TestCase)\nRETURN sw"
+    },
+    {
+      "id": "16-violation",
+      "type": "text",
+      "duration": 8,
+      "text": "⚠️ VALIDIERUNG:\n\nSW-003 \"Warnblinker Override\"\nhat KEINEN zugeordneten Test!\n\n→ TC-005 fehlt",
+      "textColor": "#ff6b6b",
+      "background": "#2d1f1f"
+    },
+    {
+      "id": "17-audit",
+      "type": "text",
+      "duration": 5,
+      "text": "Das wäre ein Audit-Finding."
+    },
+    {
+      "id": "18-chapter5-title",
+      "type": "chapter",
+      "duration": 3,
+      "text": "Kapitel 5: Impact-Analyse",
+      "chapterNumber": 5
+    },
+    {
+      "id": "19-scenario",
+      "type": "text",
+      "duration": 5,
+      "text": "Szenario:\n\nDas Fahrwerk-Team ändert\ndie CAN-Message EXT-001"
+    },
+    {
+      "id": "20-impact-result",
+      "type": "text",
+      "duration": 10,
+      "text": "IMPACT ANALYSE: EXT-001\n(CAN BrakePedalForce)\n\nBetroffen:\n1. SYS-003 \"Bremslicht <50ms\"\n   → Reaktionszeit abhängig von CAN\n\n2. SW-002 \"Bremslicht-Schwellwert\"\n   → Schwellwert abhängig von Resolution"
+    },
+    {
+      "id": "21-warning",
+      "type": "text",
+      "duration": 6,
+      "text": "⚠️ WARNUNG:\n\nDas Außenlicht-Team wurde\nvermutlich NICHT informiert!",
+      "textColor": "#fbbf24"
+    },
+    {
+      "id": "22-graph-knows",
+      "type": "text",
+      "duration": 5,
+      "text": "Der Graph weiß,\nwas Sie nicht wissen."
+    },
+    {
+      "id": "23-chapter6-title",
+      "type": "chapter",
+      "duration": 3,
+      "text": "Kapitel 6: Machine Learning",
+      "chapterNumber": 6
+    },
+    {
+      "id": "24-centrality",
+      "type": "screenshot",
+      "duration": 8,
+      "source": "05-dashboard-centrality.png",
+      "overlay": "Wichtigkeit & Abhängigkeiten"
+    },
+    {
+      "id": "25-pagerank-result",
+      "type": "text",
+      "duration": 8,
+      "text": "WICHTIGKEITS-ANALYSE:\n\nWichtigste Requirements:\n1. SYS-003 \"Bremslicht <50ms\"\n   Wert: 0.42\n\n2. SW-002 \"Schwellwert\"\n   Wert: 0.38"
+    },
+    {
+      "id": "26-prediction",
+      "type": "text",
+      "duration": 8,
+      "text": "LINK PREDICTION:\n\nVorhergesagte fehlende Links:\n\n1. SW-003 → TC-???\n   Konfidenz: 87%\n   → Warnblinker Override braucht Test!\n\n2. SYS-004 → SW-???\n   Konfidenz: 72%"
+    },
+    {
+      "id": "27-similarity",
+      "type": "text",
+      "duration": 6,
+      "text": "SIMILARITY zu SYS-003:\n\n1. SYS-001 \"Blinker <100ms\" - 0.67\n2. SYS-007 \"Warnblinker\" - 0.54"
+    },
+    {
+      "id": "28-chapter7-title",
+      "type": "chapter",
+      "duration": 3,
+      "text": "Kapitel 7: Lernendes System",
+      "chapterNumber": 7
+    },
+    {
+      "id": "29-feedback",
+      "type": "text",
+      "duration": 6,
+      "text": "FEEDBACK:\n\nSYS-003 hat vage Zeitangabe\n\"<50ms\" → besser: \"30-50ms\"\n\n→ Learning Event erstellt\n→ Pattern-Erkennung getriggert"
+    },
+    {
+      "id": "30-patterns",
+      "type": "screenshot",
+      "duration": 8,
+      "source": "06-dashboard-patterns.png",
+      "overlay": "Pattern Detection"
+    },
+    {
+      "id": "31-patterns-result",
+      "type": "text",
+      "duration": 8,
+      "text": "ERKANNTE ANTI-PATTERNS:\n\n1. VAGE ZEITANGABE (3 Treffer)\n   • SYS-003: \"<50ms\"\n   • SYS-001: \"<100ms\"\n   • EXT-003: \">100ms\"\n\n2. UNSPEZIFISCHE BEDINGUNG\n   • STK-004: \"bei einer Panne\""
+    },
+    {
+      "id": "32-learning",
+      "type": "text",
+      "duration": 6,
+      "text": "Aus EINEM Feedback\nlernt das System\nALLE ähnlichen Fälle.",
+      "textColor": "#4ade80"
+    },
+    {
+      "id": "33-timeline",
+      "type": "screenshot",
+      "duration": 6,
+      "source": "08-dashboard-timeline.png",
+      "overlay": "Learning Timeline"
+    },
+    {
+      "id": "34-summary-title",
+      "type": "chapter",
+      "duration": 3,
+      "text": "Zusammenfassung",
+      "chapterNumber": 8
+    },
+    {
+      "id": "35-summary",
+      "type": "text",
+      "duration": 10,
+      "text": "Sie haben gesehen:\n\n• Stufe 1-2: PDFs allein reichen nicht\n• Stufe 3-5: Knowledge Graph + Regeln\n  = 70-80% des Wertes\n• Stufe 6: ML identifiziert Kritikalität\n• Stufe 7: Das System lernt"
+    },
+    {
+      "id": "36-cta",
+      "type": "title",
+      "duration": 5,
+      "text": "Von Dokumenten zu Wissen",
+      "subtext": "Pilot in 4-6 Wochen"
+    },
+    {
+      "id": "37-contact",
+      "type": "title",
+      "duration": 5,
+      "text": "siglochconsulting.de"
+    }
+  ]
+}
