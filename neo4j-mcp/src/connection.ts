@@ -11,6 +11,7 @@ import neo4j, { Driver } from 'neo4j-driver';
 const NEO4J_URI = process.env.NEO4J_URI || 'bolt://localhost:7687';
 const NEO4J_USER = process.env.NEO4J_USER || 'neo4j';
 const NEO4J_PASSWORD = process.env.NEO4J_PASSWORD || 'demo-password';
+export const NEO4J_INSTANCE = process.env.NEO4J_INSTANCE || 'DataMaturityStages-Demo';
 
 // Expected database fingerprint - Demo data must contain these markers
 const EXPECTED_FINGERPRINT = {
@@ -67,6 +68,7 @@ async function verifyDemoDatabase(d: Driver): Promise<boolean> {
     }
 
     console.error('✅ SECURITY: Database fingerprint verified');
+    console.error('   - Instance: ' + NEO4J_INSTANCE);
     console.error('   - Marker node STK-001: found');
     console.error('   - Required labels: all present');
     console.error('   - Node count: ' + nodeCount + ' (within demo range)');
