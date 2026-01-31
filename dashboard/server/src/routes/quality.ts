@@ -122,7 +122,7 @@ async function executeScoring(): Promise<{
       MATCH (r:Regel)
       WHERE r.aktiv = true AND r.wirkung = 'Scoring'
       RETURN r.id AS id, r.name AS name, r.beschreibung AS beschreibung,
-             r.cypher_measure AS cypher, r.schwellwert AS schwellwert,
+             r.cypher AS cypher, r.schwellwert AS schwellwert,
              r.richtung AS richtung, r.domain AS domain, r.standard AS standard
     `);
 
@@ -333,8 +333,12 @@ router.get('/', async (_req: Request, res: Response): Promise<void> => {
 router.get('/validation', async (_req: Request, res: Response): Promise<void> => {
   try {
     const validationData = await executeValidation();
+    const totalViolations = validationData.violations.reduce(
+      (sum, v) => sum + v.affectedElements.length, 0
+    );
     const response = ValidationResultSchema.parse({
       ...validationData,
+      totalViolations,
       timestamp: new Date().toISOString(),
     });
     res.json(response);

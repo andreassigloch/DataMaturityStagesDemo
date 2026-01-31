@@ -466,7 +466,7 @@ CREATE (val5:Regel {
   confidence: 1.0,
   anwendungen: 0,
   treffer: 0,
-  aktiv: false,
+  aktiv: true,
   erstelltAm: datetime()
 })
 
