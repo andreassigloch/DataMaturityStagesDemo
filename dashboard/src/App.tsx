@@ -73,7 +73,7 @@ const TABS: { id: Tab; label: string; icon: React.ReactElement }[] = [
   },
   {
     id: 'timeline',
-    label: '7 Lernverlauf',
+    label: '7 Lernen',
     icon: (
       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path

@@ -42,6 +42,9 @@ interface DashboardState {
   detectedPatterns: DetectedPattern[]
   selectedPatternId: string | null
 
+  // Legend info popup
+  selectedLegendItem: string | null
+
   // UI state
   activeTab: Tab
   filters: FilterState
@@ -67,6 +70,7 @@ interface DashboardState {
 
   addPattern: (pattern: DetectedPattern) => void
   selectPattern: (patternId: string | null) => void
+  setSelectedLegendItem: (item: string | null) => void
 
   setActiveTab: (tab: Tab) => void
   updateFilters: (filters: Partial<FilterState>) => void
@@ -110,6 +114,7 @@ export const useDashboardStore = create<DashboardState>()(
 
       detectedPatterns: MOCK_DETECTED_PATTERNS,
       selectedPatternId: null,
+      selectedLegendItem: null,
 
       activeTab: 'graph',
       filters: defaultFilters,
@@ -210,6 +215,9 @@ export const useDashboardStore = create<DashboardState>()(
           'selectPattern'
         )
       },
+
+      setSelectedLegendItem: (item) =>
+        set({ selectedLegendItem: item }, false, 'setSelectedLegendItem'),
 
       // UI actions
       setActiveTab: (tab) => set({ activeTab: tab }, false, 'setActiveTab'),

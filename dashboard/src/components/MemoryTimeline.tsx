@@ -67,6 +67,40 @@ const AKTION_LABELS: Record<string, string> = {
   rejected: 'Abgelehnt',
 }
 
+// Pattern-Beschreibungen für Info-Popup (aligned with aimprove ADR-001)
+const PATTERN_DESCRIPTIONS: Record<string, { title: string; description: string; example: string }> = {
+  manuell: {
+    title: 'Manuelle Eingabe',
+    description: 'User erstellt Regel oder Annotation direkt im System.',
+    example: 'User definiert: "Alle Brems-Requirements brauchen ASIL-D"',
+  },
+  feedback: {
+    title: 'User-Feedback',
+    description: 'Aus explizitem User-Feedback abgeleitet. System lernt aus Korrekturen und Bestätigungen.',
+    example: 'User markiert SYS-003 als "unvollständig" → Feedback gespeichert',
+  },
+  pattern: {
+    title: 'Pattern-Erkennung',
+    description: 'System erkennt wiederkehrende Muster und schlägt Regel vor.',
+    example: '3× gleiche Korrektur → "Soll ich Regel erstellen?"',
+  },
+  chat: {
+    title: 'Chat-Extraktion',
+    description: 'Aus Chat-Verlauf extrahierte Intention. Erkennt implizite Regeln in Konversationen.',
+    example: '"Immer ASIL angeben" → Regel VAL-005',
+  },
+  import: {
+    title: 'Externer Import',
+    description: 'Regeln aus externen Quellen wie Standards, PDFs oder anderen Systemen importiert.',
+    example: 'ISO 26262 Regel aus PDF extrahiert',
+  },
+  similar: {
+    title: 'Ähnlichkeitsanalyse',
+    description: 'Embedding-basierte Erkennung ähnlicher Requirements oder Patterns.',
+    example: 'SYS-003 ähnlich zu SYS-007 → gleiche Regel anwenden',
+  },
+}
+
 // Legacy mapping für eventType (backwards compatibility)
 const LEGACY_EVENT_COLORS: Record<string, string> = {
   learn: 'var(--color-success)',
@@ -235,6 +269,8 @@ function TimelineEvent({ event, isNew }: TimelineEventProps) {
 
 export function MemoryTimeline() {
   const memoryEvents = useDashboardStore((s) => s.memoryEvents)
+  const selectedLegendItem = useDashboardStore((s) => s.selectedLegendItem)
+  const setSelectedLegendItem = useDashboardStore((s) => s.setSelectedLegendItem)
 
   const containerRef = useRef<HTMLDivElement>(null)
   const lastEventIdRef = useRef<string | null>(null)
@@ -268,15 +304,18 @@ export function MemoryTimeline() {
         </div>
       </div>
 
-      {/* CR-017: Lernquellen-Legende */}
+      {/* CR-017: Lernquellen-Legende (klickbar für Info) */}
       <div
-        className="flex flex-wrap gap-3 border-b border-[var(--color-border)] px-4 py-2"
+        className="relative flex flex-wrap gap-3 border-b border-[var(--color-border)] px-4 py-2"
         data-testid="timeline-legend"
       >
         {Object.entries(QUELLE_COLORS).map(([quelle, color]) => (
-          <div
+          <button
             key={quelle}
-            className="flex items-center gap-1"
+            onClick={() => setSelectedLegendItem(selectedLegendItem === quelle ? null : quelle)}
+            className={`flex items-center gap-1 rounded px-1.5 py-0.5 transition-colors hover:bg-[var(--color-surface-elevated)] ${
+              selectedLegendItem === quelle ? 'bg-[var(--color-surface-elevated)] ring-1 ring-[var(--color-primary)]' : ''
+            }`}
             data-testid={`legend-${quelle}`}
           >
             <span
@@ -286,9 +325,48 @@ export function MemoryTimeline() {
             <span className="text-xs text-[var(--color-text-muted)]">
               {QUELLE_ICONS[quelle]} {QUELLE_LABELS[quelle] || quelle}
             </span>
-          </div>
+          </button>
         ))}
       </div>
+
+      {/* Pattern Info Popup */}
+      {selectedLegendItem && PATTERN_DESCRIPTIONS[selectedLegendItem] && (
+        <div
+          className="border-b border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-4 py-3"
+          data-testid="pattern-info-popup"
+        >
+          <div className="flex items-start justify-between">
+            <div>
+              <h4 className="flex items-center gap-2 text-sm font-medium text-[var(--color-text-primary)]">
+                <span
+                  className="flex h-5 w-5 items-center justify-center rounded-full text-xs"
+                  style={{ backgroundColor: QUELLE_COLORS[selectedLegendItem] }}
+                >
+                  {QUELLE_ICONS[selectedLegendItem]}
+                </span>
+                {PATTERN_DESCRIPTIONS[selectedLegendItem].title}
+              </h4>
+              <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
+                {PATTERN_DESCRIPTIONS[selectedLegendItem].description}
+              </p>
+              <div className="mt-2 rounded bg-[var(--color-surface)] p-2">
+                <span className="text-[10px] font-medium uppercase tracking-wide text-[var(--color-text-muted)]">
+                  Beispiel
+                </span>
+                <p className="mt-0.5 text-xs italic text-[var(--color-text-secondary)]">
+                  {PATTERN_DESCRIPTIONS[selectedLegendItem].example}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setSelectedLegendItem(null)}
+              className="text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Timeline content */}
       <div
