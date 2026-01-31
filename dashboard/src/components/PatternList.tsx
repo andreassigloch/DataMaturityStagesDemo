@@ -25,19 +25,19 @@ const PATTERN_TYPE_ICONS: Record<DetectedPattern['patternType'], string> = {
 }
 
 const PATTERN_DESCRIPTIONS: Record<DetectedPattern['patternType'], string> = {
-  cluster: 'Tightly connected group of nodes',
-  hierarchy: 'Tree-like structure with clear parent-child relationships',
-  bridge: 'Nodes connecting otherwise separate communities',
-  hub: 'High-degree nodes with many connections',
-  cycle: 'Circular dependency pattern',
-  chain: 'Linear sequence of connected nodes',
+  cluster: 'Gruppe eng verbundener Elemente',
+  hierarchy: 'Baumstruktur mit klaren Über-/Unterordnungen',
+  bridge: 'Elemente die separate Bereiche verbinden',
+  hub: 'Zentrale Elemente mit vielen Verbindungen',
+  cycle: 'Zirkuläre Abhängigkeit',
+  chain: 'Lineare Abfolge verbundener Elemente',
 }
 
 function formatTimestamp(isoString: string): string {
   const date = new Date(isoString)
-  return date.toLocaleString('en-US', {
-    month: 'short',
+  return date.toLocaleString('de-DE', {
     day: 'numeric',
+    month: 'short',
     hour: '2-digit',
     minute: '2-digit',
   })
@@ -130,7 +130,7 @@ function PatternCard({ pattern, isSelected, onSelect }: PatternCardProps) {
             <circle cx="12" cy="12" r="4" />
           </svg>
           <span className="text-[var(--color-text-muted)]">
-            {pattern.nodeIds.length} nodes
+            {pattern.nodeIds.length} Elemente
           </span>
         </div>
         <span
@@ -148,7 +148,7 @@ function PatternCard({ pattern, isSelected, onSelect }: PatternCardProps) {
           data-testid="pattern-node-list"
         >
           <div className="text-xs text-[var(--color-text-muted)]">
-            Involved nodes:
+            Betroffene Elemente:
           </div>
           <div className="mt-1 flex flex-wrap gap-1">
             {pattern.nodeIds.slice(0, 10).map((nodeId) => (
@@ -161,7 +161,7 @@ function PatternCard({ pattern, isSelected, onSelect }: PatternCardProps) {
             ))}
             {pattern.nodeIds.length > 10 && (
               <span className="rounded bg-[var(--color-surface)] px-2 py-0.5 text-xs text-[var(--color-text-muted)]">
-                +{pattern.nodeIds.length - 10} more
+                +{pattern.nodeIds.length - 10} weitere
               </span>
             )}
           </div>
@@ -212,7 +212,7 @@ export function PatternList() {
         <div className="mb-3 grid grid-cols-2 gap-4">
           <div className="rounded-lg bg-[var(--color-surface-elevated)] p-3">
             <div className="text-xs text-[var(--color-text-muted)]">
-              Total Patterns
+              Gefundene Probleme
             </div>
             <div
               className="text-2xl font-bold text-[var(--color-text-primary)]"
@@ -223,7 +223,7 @@ export function PatternList() {
           </div>
           <div className="rounded-lg bg-[var(--color-surface-elevated)] p-3">
             <div className="text-xs text-[var(--color-text-muted)]">
-              Avg Confidence
+              Ø Sicherheit
             </div>
             <div
               className="text-2xl font-bold text-[var(--color-success)]"
@@ -266,7 +266,7 @@ export function PatternList() {
         data-testid="pattern-legend"
       >
         <div className="text-xs text-[var(--color-text-muted)]">
-          Pattern Types:
+          Problem-Arten:
         </div>
         <div className="mt-1 grid grid-cols-2 gap-1 text-xs">
           {Object.entries(PATTERN_DESCRIPTIONS).map(([type, description]) => (
@@ -312,10 +312,10 @@ export function PatternList() {
                 />
               </svg>
               <p className="text-sm text-[var(--color-text-muted)]">
-                No patterns detected yet.
+                Noch keine Probleme gefunden.
               </p>
               <p className="text-xs text-[var(--color-text-muted)]">
-                Patterns will appear as the system learns.
+                Probleme werden angezeigt, sobald das System lernt.
               </p>
             </div>
           </div>
