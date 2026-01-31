@@ -20,6 +20,7 @@ import { detectPatterns } from './detect-patterns.js';
 import { getLearningTimeline } from './learning-timeline.js';
 import { getMemoryStats } from './memory-stats.js';
 import { getDbInfo } from './db-info.js';
+import { setProjectMeta } from './admin.js';
 
 // =============================================================================
 // Tool Definitions (for ListToolsRequestSchema)
@@ -30,6 +31,21 @@ export const toolDefinitions = [
     name: 'db_info',
     description: 'Zeige Informationen über die verbundene Datenbank: Projektname, Version, Domain, Statistiken.',
     inputSchema: { type: 'object', properties: {} }
+  },
+  {
+    name: 'set_project_meta',
+    description: 'Setze Projekt-Metadaten für Datenbank-Identifikation.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', description: 'Projektname' },
+        description: { type: 'string', description: 'Beschreibung' },
+        domain: { type: 'string', description: 'Anwendungsbereich (z.B. Automotive/ADAS)' },
+        version: { type: 'string', description: 'Version (default: 1.0.0)' },
+        standards: { type: 'array', items: { type: 'string' }, description: 'Standards (z.B. A-SPICE, ISO 26262)' }
+      },
+      required: ['name']
+    }
   },
   {
     name: 'query',
@@ -212,6 +228,18 @@ async function executeToolLogic(
   switch (name) {
     case 'db_info':
       return getDbInfo(driver);
+
+    case 'set_project_meta': {
+      const name = args?.name as string;
+      if (!name) throw new Error('name parameter is required');
+      return setProjectMeta(driver, {
+        name,
+        description: args?.description as string,
+        domain: args?.domain as string,
+        version: args?.version as string,
+        standards: args?.standards as string[]
+      });
+    }
 
     case 'query': {
       const cypher = args?.cypher as string;

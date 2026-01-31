@@ -699,6 +699,47 @@ This includes:
 
 Remember: **Claude Flow CLI coordinates, Claude Code Task tool creates!**
 
+## 🗄️ Neo4j MCP Tools (DataMaturityStages)
+
+### Verfügbare Tools
+
+| Tool | Modus | Beschreibung |
+|------|-------|--------------|
+| `db_info` | READ | Datenbank-Identifikation: Projektname, Domain, Stats |
+| `query` | READ | Cypher-Abfragen (nur MATCH, RETURN, WITH, UNWIND) |
+| `set_project_meta` | WRITE | Setze Projekt-Metadaten (:ProjectMeta Knoten) |
+| `validate` | READ | Prüfe Validierungsregeln |
+| `scoring` | READ | Führe Scoring-Regeln aus |
+| `optimize` | READ | Generiere Optimierungsvorschläge |
+| `add_rule` | WRITE | Neue Regel hinzufügen |
+| `toggle_rule` | WRITE | Regel aktivieren/deaktivieren |
+| `centrality_analysis` | READ | PageRank, Betweenness Centrality |
+| `impact_analysis` | READ | Downstream-Abhängigkeiten |
+| `record_feedback` | WRITE | Feedback zu Requirement speichern |
+| `detect_patterns` | READ | Anti-Patterns erkennen |
+| `learning_timeline` | READ | Learning Events chronologisch |
+| `memory_stats` | READ | System-Gedächtnis Statistiken |
+
+### Database Identification
+
+**Bei Verbindung immer zuerst `db_info` aufrufen:**
+```
+db_info → { instance: "DataMaturityStages-Demo", project: { name: "...", domain: "..." } }
+```
+
+**Wenn ProjectMeta fehlt:**
+```
+set_project_meta { name: "DataMaturityStages", domain: "Automotive/ADAS", standards: ["A-SPICE", "ISO 26262"] }
+```
+
+### Read vs Write Pattern
+
+- **READ Tools**: Verwenden `defaultAccessMode: 'READ'`, sicher für explorative Abfragen
+- **WRITE Tools**: Dedizierte Funktionen (add_rule, toggle_rule, record_feedback, set_project_meta)
+- **query Tool**: Blockt MERGE, SET, DELETE - nur Lesezugriff erlaubt
+
+---
+
 # important-instruction-reminders
 Do what has been asked; nothing more, nothing less.
 NEVER create files unless they're absolutely necessary for achieving your goal.
