@@ -562,3 +562,15 @@ CREATE (opt2:Regel {
   aktiv: true,
   erstelltAm: datetime()
 });
+
+// =============================================================================
+// Project Metadata - Database Identification
+// =============================================================================
+MERGE (pm:ProjectMeta {id: 'project-meta'})
+SET pm.name = 'DataMaturityStages',
+    pm.description = 'Requirements Traceability Demo - Automotive AiSE Framework',
+    pm.version = '1.0.0',
+    pm.domain = 'Automotive/ADAS',
+    pm.standards = ['A-SPICE', 'ISO 26262', 'INCOSE'],
+    pm.created = datetime('2025-01-01T00:00:00Z'),
+    pm.updated = datetime();

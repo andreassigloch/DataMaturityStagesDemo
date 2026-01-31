@@ -19,12 +19,18 @@ import { recordFeedback } from './record-feedback.js';
 import { detectPatterns } from './detect-patterns.js';
 import { getLearningTimeline } from './learning-timeline.js';
 import { getMemoryStats } from './memory-stats.js';
+import { getDbInfo } from './db-info.js';
 
 // =============================================================================
 // Tool Definitions (for ListToolsRequestSchema)
 // =============================================================================
 
 export const toolDefinitions = [
+  {
+    name: 'db_info',
+    description: 'Zeige Informationen über die verbundene Datenbank: Projektname, Version, Domain, Statistiken.',
+    inputSchema: { type: 'object', properties: {} }
+  },
   {
     name: 'query',
     description: 'Führe Read-Only Cypher-Queries aus. Für Traversierungen, Aggregationen, Suchen in der Requirements-Datenbank.',
@@ -204,6 +210,9 @@ async function executeToolLogic(
   args: ToolArgs | undefined
 ): Promise<unknown> {
   switch (name) {
+    case 'db_info':
+      return getDbInfo(driver);
+
     case 'query': {
       const cypher = args?.cypher as string;
       if (!cypher) throw new Error('cypher parameter is required');
