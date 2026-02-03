@@ -21,3 +21,12 @@ neo4j-data/
 # Logs
 *.log
 npm-debug.log*
+
+# Claude Flow / Swarm state
+.claude-flow/daemon-state.json
+.claude-flow/daemon.pid
+.claude-flow/.trend-cache.json
+.swarm/state.json
+
+# Generated reports
+dashboard/playwright-report/
