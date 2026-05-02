@@ -17,6 +17,8 @@ Drei zusammenhängende Lücken machten die Demo angreifbar, sobald jemand parall
 
 3. **Externe CAN-Inputs ohne PDF-Verankerung + ASIL-Bruch unentdeckt.** EXT-002 (Plattform-Zykluszeit) und EXT-003 (Safety-Timeout) existierten nur im Graph. Schlimmer: SW-002 hatte ASIL D, sein Vorgänger SYS-003 nur ASIL C — ein klarer ISO-26262-Verstoß ohne entsprechende Validierungsregel. Die Impact-Demo (EXT-001 ändert sich) blieb damit oberflächlich, weil die ASIL-Vererbungs-Story nicht im Graph sichtbar war.
 
+> **Wichtige Klarstellung:** Die Lastenhefte sind in sich konsistent (Lastenheft §2.1 dokumentiert die ASIL-Decomposition D→C explizit, CAN-Spec §3.1 erlaubt "ASIL ≤ D"). Der ASIL-Bruch entsteht **erst im Graph beim Refinement System→Software** — also genau dort, wo in echten Projekten lokale Engineering-Entscheidungen getroffen werden, ohne die Hierarchie-Wirkung zu prüfen. SW-002 erbt ASIL D aus EXT-001 (ASIL D), übersieht aber, dass SYS-003 nur C ist. Im PDF fällt das nicht auf, im Graph schon. Das ist der eigentliche Demo-Wert — nicht "PDFs widersprechen sich", sondern "PDF-konforme Einzelentscheidungen ergeben in Summe einen Compliance-Bruch".
+
 ---
 
 ## Lösung

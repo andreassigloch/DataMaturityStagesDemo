@@ -89,13 +89,37 @@ StakeholderReq ──TRACED_TO──> SystemReq ──TRACED_TO──> SoftwareR
 
 ---
 
-## 3. Demo-spezifische Lücken (absichtlich!)
+## 3. Demo-spezifische Modellierungs-Defekte (absichtlich!)
 
-Die Seed-Daten enthalten **vorsätzlich unvollständige bzw. inkonsistente** Modellierung, damit die Validierungsregeln in der Live-Demo Findings produzieren:
+**Wichtig:** Die Lastenhefte sind in sich konsistent. Die Defekte entstehen erst beim **Refinement von Stakeholder- über System- zu Software-Anforderungen** — also genau dort, wo in echten Projekten Engineering-Entscheidungen lokal getroffen werden, ohne die Auswirkung auf die Gesamthierarchie zu überblicken. Im Word-Dokument fallen sie nicht auf; im Graph macht die Validierung sie sichtbar.
 
-1. **`SW-003` (Warnblinker Override)** hat keinen `VERIFIED_BY → TestCase`. → triggert Regel `VAL-002` (Test-Coverage).
-2. **`InputSpec`-Knoten** (EXT-001..003) sind im Lastenheft erwähnt, aber im Außenlicht-Team oft "blinder Fleck". → triggert Regel `VAL-004` und `impact_analysis`.
-3. **ASIL-Bruch SYS-003 (C) → SW-002 (D):** Die Software-Anforderung erbt einen höheren ASIL als ihr System-Vorgänger, ohne dass eine ASIL-Decomposition (ISO 26262-9) dokumentiert ist. → triggert Regel `VAL-006`. Hintergrund: SW-002 wurde aus EXT-001 (CAN BrakePedalForce, ASIL D) abgeleitet — die ASIL-Stufe stammt aus der Eingabe, nicht aus dem System-Req. Das ist ein typischer Audit-Befund in der Praxis.
+| # | Defekt | Triggert Regel | Realitätsbezug |
+|---|--------|----------------|----------------|
+| 1 | `SW-003` (Warnblinker Override) hat keinen `VERIFIED_BY → TestCase` | `VAL-002` (Test-Coverage), A-SPICE SWE.4 | Test-Lücken passieren beim Schnitt zwischen SW-Entwicklung und Testteam |
+| 2 | `InputSpec`-Knoten (EXT-001..003) sind im Lastenheft §5.2 erwähnt, aber als Abhängigkeiten oft schlecht im Außenlicht-Team verankert | `VAL-004`, `impact_analysis` | Klassischer "blinder Fleck" — niemand weiß, dass das eigene Team von dieser CAN-Message abhängt |
+| 3 | **ASIL-Bruch SYS-003 (C) → SW-002 (D)** beim System→SW-Refinement | `VAL-006` (ASIL-Kette monoton), ISO 26262-9 §5 | Siehe ausführliche Erklärung unten |
+
+### 3.1 Der ASIL-Bruch im Detail (kein PDF-Widerspruch!)
+
+Die Lastenhefte sind in sich widerspruchsfrei:
+
+- **Lastenheft §2.1 + STK-002:** "Bremsvorgangs-Erkennung (Stakeholder-Sicht): ASIL D, Bremslicht-Aktorik (System-/SW-Ebene): ASIL C, einzelne sicherheitskritische Pfade bis ASIL D" → ASIL-Decomposition D → C ist explizit erlaubt und dokumentiert.
+- **CAN-Spec §3.1:** BrakePedalForce 0x123 ist ASIL D, "Empfänger dürfen abgeleitete Sicherheitsanforderungen mit ASIL ≤ D modellieren".
+
+Beide Aussagen für sich genommen sind korrekt. Der Bruch entsteht **erst im Graph** beim Übergang System → Software:
+
+```
+STK-002 (D) ──TRACED_TO──> SYS-003 (C) ──TRACED_TO──> SW-002 (D)
+                            (legitime                  ↑
+                             Decomposition,            unkontrollierter Sprung
+                             im Lastenheft             zurück auf D, ohne dass
+                             begründet)                eine zweite Decomposition
+                                                       dokumentiert wurde
+```
+
+**Was vermutlich passiert ist** (typische Engineering-Realität): Der Software-Engineer modelliert SW-002 für die CAN-Eingabe EXT-001 (ASIL D) und übernimmt deren ASIL-Stufe direkt aus der Eingabe. Das ist lokal plausibel — die Software muss ja die Daten eines ASIL-D-Signals verarbeiten. Übersehen wird dabei, dass SW-002 in der Hierarchie **unter** SYS-003 (ASIL C) hängt und damit eine ASIL-Erhöhung ohne Decomposition entsteht.
+
+Im Word-Dokument fällt das niemand auf. Im Graph findet `VAL-006` es mit zwei `CASE`-Statements — das ist der Demo-Punkt.
 
 ---
 

@@ -314,11 +314,13 @@ Violations: 1
 
 #### Talking Points
 
-> "Das ist der zweite Audit-Befund. SW-002 hat ASIL D geerbt — aber nicht von seinem System-Vorgänger SYS-003 (ASIL C), sondern aus der externen CAN-Eingabe EXT-001 (ASIL D). Das ist die übliche Falle: ASIL wandert quer durchs System, ohne dass es jemand in der Hierarchie dokumentiert."
+> "Das ist der zweite Audit-Befund — und der subtilere. Schauen Sie sich die Quellen an: Das Lastenheft sagt klar, dass die Bremslicht-Aktorik auf ASIL C heruntergebrochen werden darf. Die CAN-Spec sagt, BrakePedalForce ist ASIL D. Beides für sich ist korrekt."
 
-> "ISO 26262-9 §5 erlaubt das nur bei dokumentierter ASIL-Decomposition. Im Audit ist das ein Finding der Kategorie *Major*."
+> "Was ist passiert? Der Software-Engineer modelliert SW-002 für die CAN-Eingabe und übernimmt deren ASIL-Stufe — D. Lokal absolut plausibel: die Software verarbeitet ja ein D-Signal. Übersehen wird, dass SW-002 in der Hierarchie unter SYS-003 (C) hängt. Damit entsteht eine ASIL-Erhöhung ohne dokumentierte Decomposition."
 
-> "Wieder: Der Graph hat es gefunden. Eine Cypher-Regel mit zwei CASE-Statements. Im Word-Dokument hätte das niemand bemerkt."
+> "ISO 26262-9 §5 erlaubt das nur mit expliziter ASIL-Decomposition. Im Audit: Major-Finding."
+
+> "Das ist der eigentliche Punkt: Kein PDF widerspricht einem anderen. Jede einzelne Entscheidung war lokal richtig. Erst die Summe ergibt den Compliance-Bruch — und genau das findet im Word-Dokument niemand. Im Graph reichen zwei CASE-Statements."
 
 ---
 
