@@ -12,18 +12,22 @@
 
 ## 1. Geltungsbereich
 
-Diese Spezifikation definiert die CAN-Bus-Schnittstellen der Fahrwerk-Domäne für die Plattform MQB-evo. Sie gilt für alle Steuergeräte, die Fahrdynamik-relevante Daten austauschen.
+Diese Spezifikation definiert die CAN-Bus-Schnittstellen der Fahrwerk-Domäne für die Plattform MQB-evo. Sie gilt für alle Steuergeräte, die Fahrdynamik-relevante Daten austauschen, einschließlich der von Empfänger-Domänen genutzten Plattform-weiten Vorgaben (Zykluszeit, Timeout-Handling).
 
 ---
 
 ## 2. Allgemeine Parameter
 
-| Parameter | Wert |
-|-----------|------|
-| Busgeschwindigkeit | 500 kBit/s |
-| Protokoll | CAN 2.0B |
-| Terminierung | 120 Ohm an Endknoten |
-| Adressbereich | 0x100 - 0x1FF |
+| Parameter | Wert | Quelle |
+|-----------|------|--------|
+| Busgeschwindigkeit | 500 kBit/s | Plattform-Team |
+| Maximale Zykluszeit (Plattform-Vorgabe) | 10 ms | Plattform-Team (PLT-CAN-2024, v1.1) |
+| Protokoll | CAN 2.0B | Plattform-Team |
+| Terminierung | 120 Ohm an Endknoten | Plattform-Team |
+| Adressbereich Fahrwerk | 0x100 - 0x1FF | Fahrwerk-Team |
+| Timeout-Handling | Fail-Safe ab >100 ms | Safety-Team (SAF-CAN-2024, v4.0) |
+
+> **Hinweis:** Die maximale Zykluszeit (10 ms) ist eine plattformweite Vorgabe und legt damit die obere Grenze für alle reaktionszeitkritischen Auswertungen fest. Empfänger-Systeme dürfen sich auf diese Garantie verlassen, müssen aber bei Überschreitung in den durch das Safety-Team definierten Fail-Safe-Zustand übergehen.
 
 ---
 
@@ -40,6 +44,7 @@ Diese Spezifikation definiert die CAN-Bus-Schnittstellen der Fahrwerk-Domäne f�
 | Cycle Time | 10 ms |
 | Timeout | 100 ms |
 | Sender | Bremskraftverstärker (BKV-SG) |
+| **ASIL-Klassifikation** | **D** |
 
 **Signal-Definition:**
 
@@ -63,9 +68,43 @@ Diese Spezifikation definiert die CAN-Bus-Schnittstellen der Fahrwerk-Domäne f�
 - Latenz (Sensor bis CAN): < 5 ms
 - Signalalter-Information: Byte 3, Bit 0-7 (Zähler 0-255)
 
+**Sicherheitsrelevanz:**
+
+Da Bremslicht-Auslösung und ESP-Eingriffe dieses Signal als Eingangsgröße verwenden und beide Funktionen sicherheitskritisch sind, ist die Message als ASIL D klassifiziert. Empfangende Systeme dürfen abgeleitete Sicherheitsanforderungen mit ASIL ≤ D modellieren; eine Anhebung über die Sender-Klassifikation hinaus ist gemäß ISO 26262-9 nicht zulässig.
+
 ---
 
-## 4. Änderungshistorie
+## 4. Plattformweite Vorgaben
+
+Die folgenden Festlegungen werden nicht vom Fahrwerk-Team selbst getroffen, sind aber für alle CAN-Empfänger der Fahrwerk-Domäne verbindlich. Sie sind hier zusammengefasst, weil sie die Auslegung jedes Empfängers betreffen.
+
+### 4.1 Maximale Zykluszeit (Plattform)
+
+| Eigenschaft | Wert |
+|-------------|------|
+| Quelle | Plattform-Team |
+| Quelldokument | PLT-CAN-2024, v1.1 |
+| Garantierte max. Zykluszeit | 10 ms |
+| Geltung | alle Messages im Adressbereich 0x100–0x1FF |
+| ASIL-Klassifikation | B |
+
+**Bedeutung für Empfänger:** Reaktionszeit-Anforderungen (z.B. „Bremslicht <50 ms") sind nur erfüllbar, solange der Bus die Zykluszeit einhält. Bei Erhöhung der Zykluszeit (z.B. durch zusätzliche Teilnehmer) müssen alle Empfänger ihre Reaktionszeit-Budgets neu bewerten.
+
+### 4.2 Timeout-Handling
+
+| Eigenschaft | Wert |
+|-------------|------|
+| Quelle | Safety-Team |
+| Quelldokument | SAF-CAN-2024, v4.0 |
+| Timeout-Schwelle | 100 ms |
+| Geforderte Reaktion | Fail-Safe-Zustand aktivieren |
+| ASIL-Klassifikation | C |
+
+**Bedeutung für Empfänger:** Bei Ausbleiben einer erwarteten Message für >100 ms ist die zuletzt empfangene Information als ungültig zu betrachten. Empfänger müssen einen vom Safety-Konzept des jeweiligen Systems definierten Fail-Safe-Zustand einnehmen (z.B. Bremslicht-Auslösung über Hardware-Fallback).
+
+---
+
+## 5. Änderungshistorie
 
 | Version | Datum | Autor | Änderung |
 |---------|-------|-------|----------|
@@ -73,11 +112,11 @@ Diese Spezifikation definiert die CAN-Bus-Schnittstellen der Fahrwerk-Domäne f�
 | 2.0 | 20.09.2022 | T. Becker | BrakePedalPos Signal hinzugefügt |
 | 2.1 | 05.01.2023 | T. Becker | Timeout von 150ms auf 100ms |
 | 2.2 | 12.07.2023 | T. Becker | Ungültigkeitswert definiert |
-| **2.3** | **28.02.2024** | **T. Becker** | **Resolution BrakePedalForce von 0.5N auf 0.1N geändert** |
+| 2.3 | 28.02.2024 | T. Becker | **Resolution BrakePedalForce von 0.5N auf 0.1N geändert**; ASIL-Klassifikation explizit ausgewiesen; Plattform-/Safety-Vorgaben (§4) konsolidiert |
 
 ---
 
-## 5. Wichtige Hinweise
+## 6. Wichtige Hinweise
 
 ### ⚠️ ACHTUNG - Interface-Änderung in v2.3
 
@@ -95,9 +134,19 @@ Diese Spezifikation definiert die CAN-Bus-Schnittstellen der Fahrwerk-Domäne f�
 | 500 | 250.0 N | 50.0 N |
 | 1000 | 500.0 N | 100.0 N |
 
+**Bekannte abhängige Systeme** (Stand 28.02.2024, Pflege durch Empfänger):
+
+| Empfänger-Domäne | Verwendete Größe | Auswirkung |
+|------------------|------------------|------------|
+| Außenlicht (Bremslicht) | Schwellwert 5–15 N | Schwellwert-Konfiguration neu kalibrieren |
+| ESP / ABS | Pedalkraft-Trend | unkritisch, da relativer Verlauf unverändert |
+| Adaptiver Tempomat | Override-Erkennung | Schwellwert anpassen |
+
+> **ISO 26262-8 §6.5 (Impact-Analyse):** Die Resolution-Änderung ist eine Schnittstellenänderung an einem ASIL-D-Signal. Empfänger müssen die Auswirkung auf ihre Sicherheitsanforderungen analysieren, betroffene Tests neu durchführen und die Sicherheitsargumentation aktualisieren.
+
 ---
 
-## 6. Kontakt
+## 7. Kontakt
 
 Bei Fragen zur Interface-Spezifikation:
 

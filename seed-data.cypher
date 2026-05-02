@@ -470,6 +470,24 @@ CREATE (val5:Regel {
   erstelltAm: datetime()
 })
 
+CREATE (val6:Regel {
+  id: 'VAL-006',
+  name: 'ASIL-Kette monoton',
+  beschreibung: 'Abgeleitetes Requirement darf nach ISO 26262-9 keinen hoeheren ASIL haben als seine Quelle (TRACED_TO oder DEPENDS_ON), sofern keine ASIL-Decomposition dokumentiert ist.',
+  ebene: 'Konsistenz',
+  wirkung: 'Validierung',
+  cypher: 'MATCH (a)-[r:TRACED_TO|DEPENDS_ON]->(b) WHERE a.asil IS NOT NULL AND b.asil IS NOT NULL AND CASE a.asil WHEN "QM" THEN 0 WHEN "A" THEN 1 WHEN "B" THEN 2 WHEN "C" THEN 3 WHEN "D" THEN 4 ELSE -1 END < CASE b.asil WHEN "QM" THEN 0 WHEN "A" THEN 1 WHEN "B" THEN 2 WHEN "C" THEN 3 WHEN "D" THEN 4 ELSE -1 END AND type(r) = "TRACED_TO" RETURN b.id AS id, b.titel AS name, labels(b)[0] AS typ',
+  schwere: 'fehler',
+  domain: 'Safety',
+  standard: 'ISO 26262',
+  quelle: 'manuell',
+  confidence: 1.0,
+  anwendungen: 0,
+  treffer: 0,
+  aktiv: true,
+  erstelltAm: datetime()
+})
+
 // -----------------------------------------------------
 // SCORING (wirkung: 'Scoring') → Kennzahlen
 // -----------------------------------------------------

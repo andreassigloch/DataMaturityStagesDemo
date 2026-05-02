@@ -43,7 +43,10 @@ Claude Desktop erlaubt kein temporäres Deaktivieren von MCP-Servern - nur Lösc
 - [ ] **Claude Desktop** geöffnet
   - MCP-Status prüfen: Settings > Developer > "neo4j-requirements" muss grün sein
   - Falls rot: Claude Desktop mit Cmd+Q beenden, neu starten
-- [ ] **Demo-PDFs** griffbereit im Ordner `demo-pdfs/`:
+- [ ] **Demo-PDFs** griffbereit im Ordner 
+`/Users/andreas/Documents/Projekte/prod/demos/DataMaturityStages/demo-pdfs`
+
+`demo-pdfs/`:
   - `lastenheft-aussenlicht.md`
   - `a-spice-auszug.md`
   - `iso-26262-auszug.md`
@@ -218,7 +221,7 @@ SW-003 "Warnblinker Override" hat KEINEN zugeordneten Test!
 
 **🔗 MODUS: Knowledge Graph (MCP-Tools nutzen)**
 
-#### Claude-Befehl 1 (Score)
+#### Claude-Befehl 1 — Compliance Score berechnen
 ```
 Berechne den Compliance-Score. Nutze das compliance_score Tool.
 ```
@@ -233,7 +236,7 @@ COMPLIANCE SCORE:
 Lücke: SYS-003, SYS-007 ohne vollständige Verifikation
 ```
 
-#### Claude-Befehl 2 (Regel verschärfen)
+#### Claude-Befehl 2 — Regel verschärfen (Score-Effekt)
 ```
 Füge eine strengere Regel hinzu:
 "ASIL-C Requirements brauchen mindestens 2 Tests"
@@ -257,7 +260,7 @@ Score sinkt von 85% auf ~65%
 
 ---
 
-#### Claude-Befehl 3 (Externe Abhängigkeit - HIGHLIGHT)
+#### Claude-Befehl 3 — Externe Abhängigkeit (Impact-Analyse)
 ```
 Was ist betroffen wenn das Fahrwerk-Team die CAN-Message EXT-001 ändert?
 Nutze das impact_analysis Tool mit requirementId "EXT-001".
@@ -265,16 +268,17 @@ Nutze das impact_analysis Tool mit requirementId "EXT-001".
 
 #### Erwartetes Ergebnis (WOW-Moment)
 ```
-IMPACT ANALYSE: EXT-001 (CAN BrakePedalForce)
+IMPACT ANALYSE: EXT-001 (CAN BrakePedalForce, ASIL D)
 
 Quelle: Fahrwerk-Team
 Änderung würde betreffen:
 
-1. SYS-003 "Bremslicht <50ms"
-   → Reaktionszeit abhängig von CAN-Zykluszeit
-
-2. SW-002 "Bremslicht-Schwellwert"
+1. SW-002 "Bremslicht-Schwellwert" (ASIL D)
    → Schwellwert abhängig von CAN-Resolution 0.1N
+   → SW-002 erbt ASIL D direkt aus EXT-001
+
+2. (transitiv) SYS-003 "Bremslicht <50ms" (ASIL C)
+   → über TRACED_TO mit SW-002 verbunden
 
 WARNUNG: Das Außenlicht-Team wurde vermutlich NICHT informiert!
 ```
@@ -286,6 +290,35 @@ WARNUNG: Das Außenlicht-Team wurde vermutlich NICHT informiert!
 > "Frage ans Publikum: Wusste Ihr Außenlicht-Team von dieser CAN-Änderung? In der Realität: Oft nein."
 
 > "Mit dem Knowledge Graph: Der Graph WEISS, dass diese Abhängigkeit existiert."
+
+---
+
+#### Claude-Befehl 4 — ASIL-Kette prüfen (zweiter Audit-Befund)
+
+> **An Publikum:** "Eine Sache fällt jetzt auf: SW-002 hat ASIL D, sein System-Vorgänger SYS-003 nur ASIL C. Ist das erlaubt?"
+
+```
+Pruefe die Regel VAL-006 "ASIL-Kette monoton". Nutze das validate Tool.
+```
+
+#### Erwartetes Ergebnis
+```
+VAL-006 "ASIL-Kette monoton" (ISO 26262-9)
+Violations: 1
+
+- SW-002 "Bremslicht-Schwellwert" (ASIL D)
+  Quelle: SYS-003 "Bremslicht <50ms" (ASIL C)
+  → Abgeleitete Anforderung hat hoeheren ASIL als Quelle
+  → ohne dokumentierte ASIL-Decomposition unzulaessig
+```
+
+#### Talking Points
+
+> "Das ist der zweite Audit-Befund. SW-002 hat ASIL D geerbt — aber nicht von seinem System-Vorgänger SYS-003 (ASIL C), sondern aus der externen CAN-Eingabe EXT-001 (ASIL D). Das ist die übliche Falle: ASIL wandert quer durchs System, ohne dass es jemand in der Hierarchie dokumentiert."
+
+> "ISO 26262-9 §5 erlaubt das nur bei dokumentierter ASIL-Decomposition. Im Audit ist das ein Finding der Kategorie *Major*."
+
+> "Wieder: Der Graph hat es gefunden. Eine Cypher-Regel mit zwei CASE-Statements. Im Word-Dokument hätte das niemand bemerkt."
 
 ---
 
@@ -489,6 +522,7 @@ Dashboard auf http://localhost:5175 öffnen und Tabs durchklicken:
 | 11:00 | Score | 🔗 MCP nutzen | `Berechne den Compliance-Score. Nutze compliance_score.` |
 | 13:00 | Regel | 🔗 MCP nutzen | `Füge Regel hinzu: ASIL-C braucht 2 Tests. Nutze add_rule.` |
 | 15:00 | Impact | 🔗 MCP nutzen | `Was ist betroffen wenn EXT-001 sich ändert? Nutze impact_analysis.` |
+| 16:00 | ASIL | 🔗 MCP nutzen | `Prüfe Regel VAL-006 (ASIL-Kette monoton). Nutze validate.` |
 | 17:00 | ML | 🤖 MCP+ML | `Welche Requirements sind am kritischsten? Nutze centrality_analysis.` |
 | 19:00 | Predict | 🤖 MCP+ML | `Welche Traceability-Links fehlen vermutlich? Nutze predict_missing_links.` |
 | 20:00 | Similar | 🤖 MCP+ML | `Finde ähnliche Requirements zu SYS-003. Nutze find_similar_requirements.` |
@@ -506,6 +540,7 @@ Dashboard auf http://localhost:5175 öffnen und Tabs durchklicken:
 | 9:30 | SW-003 ohne Test gefunden | "Das wäre ein Audit-Finding!" |
 | 14:00 | Score fällt von 85% auf 65% | "So sieht Realität aus" |
 | 16:00 | EXT-001 Impact-Kette | "Wusste das Team davon?" - Stille |
+| 16:30 | VAL-006 findet ASIL-Bruch SYS-003(C) → SW-002(D) | "ISO 26262 Major-Finding aus zwei CASE-Statements" |
 | 18:00 | PageRank zeigt SYS-003 als kritischstes Req | "Google-Algorithmus für Requirements!" |
 | 19:30 | System sagt SW-003 fehlenden Test voraus | "Das hatten wir manuell gefunden - jetzt automatisch" |
 | 25:00 | Pattern Detection findet 3 vage Zeitangaben | "Aus EINEM Feedback lernt es ALLE Fälle" |
