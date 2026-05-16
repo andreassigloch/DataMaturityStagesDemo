@@ -232,7 +232,7 @@ demo-requirements-traceability/
 │   ├── lastenheft-aussenlicht.md
 │   ├── a-spice-auszug.md
 │   ├── iso-26262-auszug.md
-│   └── can-interface-spec.md
+│   └── lastenheft-bremsen.md
 └── ausblick-folien/        # Konzept-Folien für Stufe 6-7
 ```
 

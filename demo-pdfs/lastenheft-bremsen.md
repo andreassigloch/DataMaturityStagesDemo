@@ -1,18 +1,20 @@
-# CAN-Bus Interface Spezifikation
+# Lastenheft Bremssystem — Auszug: CAN-Schnittstellen
 
 **Chassis Domain - Fahrwerk-Team**
 
-**Dokumentennummer:** IF-CAN-FW-2024-001
+**Dokumentennummer:** LH-BR-2024-001 (Auszug §3 CAN-Schnittstellen)
 **Version:** 2.3
 **Status:** Freigegeben
 **Datum:** 28.02.2024
 **Verantwortlich:** Thomas Becker, Interface-Koordination Fahrwerk
 
+> **Hinweis:** Dieser Auszug umfasst die nach außen sichtbaren CAN-Schnittstellen des Bremssystems. Die fahrzeuginterne Funktionsspezifikation (ABS/ESP/Bremskraftverstärkung) ist nicht Teil dieses Auszugs.
+
 ---
 
 ## 1. Geltungsbereich
 
-Diese Spezifikation definiert die CAN-Bus-Schnittstellen der Fahrwerk-Domäne für die Plattform MQB-evo. Sie gilt für alle Steuergeräte, die Fahrdynamik-relevante Daten austauschen, einschließlich der von Empfänger-Domänen genutzten Plattform-weiten Vorgaben (Zykluszeit, Timeout-Handling).
+Dieser Lastenheft-Auszug definiert die CAN-Bus-Schnittstellen des Bremssystems der Fahrwerk-Domäne für die Plattform MQB-evo. Er gilt für alle Steuergeräte, die Fahrdynamik-relevante Daten mit dem Bremssystem austauschen, einschließlich der von Empfänger-Domänen genutzten Plattform-weiten Vorgaben (Zykluszeit, Timeout-Handling).
 
 ---
 
@@ -134,14 +136,8 @@ Die folgenden Festlegungen werden nicht vom Fahrwerk-Team selbst getroffen, sind
 | 500 | 250.0 N | 50.0 N |
 | 1000 | 500.0 N | 100.0 N |
 
-**Bekannte abhängige Systeme** (Stand 28.02.2024, Pflege durch Empfänger):
-
-| Empfänger-Domäne | Verwendete Größe | Auswirkung |
-|------------------|------------------|------------|
-| Außenlicht (Bremslicht) | Schwellwert 5–15 N | Schwellwert-Konfiguration neu kalibrieren |
-| ESP / ABS | Pedalkraft-Trend | unkritisch, da relativer Verlauf unverändert |
-| Adaptiver Tempomat | Override-Erkennung | Schwellwert anpassen |
-
+> **Hinweis zur Empfängerseite:** Das Bremskraftverstärker-Steuergerät kennt seine Empfänger nicht. Welche Systeme das Signal verwenden, ist nur über projekt- oder konzernweite Verknüpfungsdatenbanken bzw. die jeweiligen Empfänger-Lastenhefte ermittelbar.
+>
 > **ISO 26262-8 §6.5 (Impact-Analyse):** Die Resolution-Änderung ist eine Schnittstellenänderung an einem ASIL-D-Signal. Empfänger müssen die Auswirkung auf ihre Sicherheitsanforderungen analysieren, betroffene Tests neu durchführen und die Sicherheitsargumentation aktualisieren.
 
 ---

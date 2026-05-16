@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-05-06T00:50:43.111Z",
+  "projectRoot": "/Users/andreas/Documents/Projekte/prod/demos/DataMaturityStages",
+  "structure": {
+    "hasPackageJson": true,
+    "hasTsConfig": false,
+    "hasClaudeConfig": true,
+    "hasClaudeFlow": true
+  },
+  "scannedAt": 1778028643111
+}

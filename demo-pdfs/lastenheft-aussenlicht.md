@@ -151,10 +151,6 @@ Die folgenden Vorgaben anderer Teams sind verbindlich und beeinflussen unsere Au
 - Leuchtmittelwechsel ohne Spezialwerkzeug
 - Diagnosefähigkeit über Standard-OBD-Interface
 
-### 6.3 Traceability & Compliance
-
-Die abgeleiteten System- und Software-Anforderungen, Tests, Komponenten und externen Abhängigkeiten werden in einem Knowledge Graph nach der Demo-Ontologie (siehe `demo-ontologie.md`) gepflegt. Die Demo-Ontologie ist eine vereinfachte, projektspezifische Teilmenge der konzernweiten SE-Ontologie `@sigloch/contracts/se` (v3.3.0).
-
 ---
 
 ## Änderungshistorie
@@ -165,7 +161,6 @@ Die abgeleiteten System- und Software-Anforderungen, Tests, Komponenten und exte
 | 2.0 | 15.06.2023 | S. Müller | Bremslicht ASIL C ergänzt |
 | 3.0 | 20.11.2023 | S. Müller | Warnblinker als eigene Funktion (STK-004), CAN-Schnittstellen präzisiert |
 | 3.1 | 08.02.2024 | S. Müller | EXT-001..003 als externe Inputs explizit ausgewiesen |
-| 3.2 | 15.03.2024 | S. Müller | Verweis auf Demo-Ontologie ergänzt |
 
 ---
 

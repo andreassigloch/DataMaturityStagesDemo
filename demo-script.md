@@ -32,7 +32,7 @@ Claude Desktop erlaubt kein temporäres Deaktivieren von MCP-Servern - nur Lösc
   docker-compose up -d
   docker ps | grep req-traceability-neo4j
   ```
-- [ ] **Neo4j Browser** geöffnet: http://localhost:7484
+- [ ] **Neo4j Browser** geöffnet: [http://localhost:7484](http://localhost:7484)
   - Login: neo4j / demo-password
   - Testquery: `MATCH (n) RETURN count(n)` → sollte ~27 Knoten zeigen
 - [ ] **Dashboard** läuft (für Stufe 6-7):
@@ -50,7 +50,7 @@ Claude Desktop erlaubt kein temporäres Deaktivieren von MCP-Servern - nur Lösc
   - `lastenheft-aussenlicht.md`
   - `a-spice-auszug.md`
   - `iso-26262-auszug.md`
-  - `can-interface-spec.md`
+  - `lastenheft-bremsen.md`
 - [ ] **Zweiter Monitor** für Neo4j Browser / Dashboard (falls verfügbar)
 
 ### Schnelltest (2 Min)
@@ -84,11 +84,11 @@ PDFs auf dem Bildschirm zeigen - Finder öffnen, durch die 4 Dokumente scrollen.
 1. `lastenheft-aussenlicht.md` - "So sieht Ihr Lastenheft aus"
 2. `a-spice-auszug.md` - "Der Standard als PDF"
 3. `iso-26262-auszug.md` - "Safety-Normen als Text"
-4. `can-interface-spec.md` - "Interface-Spec vom anderen Team"
+4. `lastenheft-bremsen.md` - "Lastenheft-Auszug vom Fahrwerk-Team (CAN-Schnittstellen)"
 
 #### Talking Points
 
-> "Das kennen Sie alle: Vier verschiedene Quellen - Lastenheft, A-SPICE, ISO 26262, CAN-Spezifikation vom Fahrwerk-Team. Jedes Team hat seine eigene Ablage."
+> "Das kennen Sie alle: Vier verschiedene Quellen - Lastenheft Außenlicht, A-SPICE, ISO 26262, Lastenheft Bremsen vom Fahrwerk-Team. Jedes Team hat seine eigene Ablage."
 
 > "Frage ans Publikum: Wie lange dauert es bei Ihnen, alle Anforderungen für das Außenlichtsystem zusammenzutragen? Ehrliche Antwort: Stunden, manchmal Tage."
 
@@ -587,7 +587,7 @@ docker exec -i req-traceability-neo4j cypher-shell -u neo4j -p demo-password < s
 
 ### Fallback bei komplettem Ausfall
 
-1. Neo4j Browser direkt nutzen (http://localhost:7484)
+1. Neo4j Browser direkt nutzen ([http://localhost:7484](http://localhost:7484))
 2. Cypher-Queries manuell ausführen
 3. Konzept-Folien zeigen: `ausblick-folien/stufe-6-7-ausblick.md`
 
