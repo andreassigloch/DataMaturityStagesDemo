@@ -8,7 +8,8 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "tsc --watch",
-    "test": "vitest run"
+    "test": "vitest run",
+    "deploy:mcp": "npm run build && rsync -a --delete dist/ ~/mcp-servers/neo4j-mcp/dist/ && rsync -a package.json package-lock.json ~/mcp-servers/neo4j-mcp/ && cd ~/mcp-servers/neo4j-mcp && npm install --omit=dev --no-audit --no-fund"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
